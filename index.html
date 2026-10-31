@@ -488,11 +488,54 @@ html{scroll-behavior:smooth}
 
   // ---- diagnostics: add #debug to the URL ----
   if(location.hash === '#debug'){
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:99;' +
+      'background:#000;border:1px solid #9fbf6a;color:#9fbf6a;' +
+      'font:11.5px/1.5 ui-monospace,monospace';
     const d = document.createElement('pre');
-    d.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:99;margin:0;' +
-      'padding:10px 12px;background:#000;border:1px solid #9fbf6a;color:#9fbf6a;' +
-      'font:11.5px/1.5 ui-monospace,monospace;white-space:pre;pointer-events:none';
-    document.body.appendChild(d);
+    d.style.cssText = 'margin:0;padding:10px 12px 8px;white-space:pre';
+    const bar = document.createElement('div');
+    bar.style.cssText = 'display:flex;gap:6px;padding:0 12px 10px;flex-wrap:wrap';
+    const note = document.createElement('span');
+    note.style.cssText = 'display:block;padding:0 12px 10px;color:#cf6a6a;min-height:1em';
+    panel.append(d, bar, note);
+    document.body.appendChild(panel);
+
+    function btn(label, fn){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label;
+      b.style.cssText = 'background:#0d0d0d;border:1px solid #9fbf6a;color:#9fbf6a;' +
+        'font:11.5px ui-monospace,monospace;padding:4px 9px;cursor:pointer';
+      b.addEventListener('click', e => { e.stopPropagation(); fn(); });
+      bar.appendChild(b);
+    }
+
+    function report(p){
+      note.textContent = '';
+      if(p && p.then) p.catch(err => note.textContent = err.name + ': ' + err.message);
+    }
+
+    btn('force play', () => {
+      vid.muted = true;            // an unmuted play will just be refused again
+      vid.playsInline = true;
+      if(vid.readyState < 2) vid.load();
+      report(vid.play());
+    });
+    btn('pause', () => vid.pause());
+    btn('rewind', () => { vid.currentTime = 0; });
+    btn('step +1f', () => {
+      vid.pause();
+      vid.currentTime = (vid.currentTime + 1 / FPS) % (vid.duration || 1);
+    });
+    btn('reload src', () => {
+      const s = vid.currentSrc || VIDEO_SRC;
+      vid.removeAttribute('src');
+      vid.load();
+      vid.src = s;
+      vid.load();
+      report(vid.play());
+    });
     const RS = ['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'];
     const NS = ['EMPTY','IDLE','LOADING','NO_SOURCE'];
     setInterval(() => {
