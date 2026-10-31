@@ -383,10 +383,10 @@ html{scroll-behavior:smooth}
       if(vid.videoWidth) box.style.aspectRatio = vid.videoWidth + ' / ' + vid.videoHeight;
       haveVideo = true;
       ready();
-      if(!reduce) vid.play().catch(() => say('render ok · click the page to start it'));
+      vid.play().catch(() => say('render ok · click the page to start it'));
     }
     vid.addEventListener('loadedmetadata', onMeta);
-    vid.addEventListener('canplay', () => { if(!reduce) vid.play().catch(()=>{}); }, {once:true});
+    vid.addEventListener('canplay', () => { vid.play().catch(()=>{}); }, {once:true});
     vid.src = src;
     vid.load();
   }
@@ -426,7 +426,6 @@ html{scroll-behavior:smooth}
     const evts = ['pointerdown','pointerup','click','keydown','touchstart','touchend','scroll','wheel'];
     function go(e){
       RQ.gestures++;
-      if(reduce) return drop();
       attempt(e && e.type || 'gesture').then(drop).catch(() => {});
     }
     function drop(){
@@ -440,7 +439,7 @@ html{scroll-behavior:smooth}
     // and keep nudging it for the first few seconds in case the policy lifts
     let n = 0;
     const t = setInterval(() => {
-      if(++n > 20 || !vid.paused || reduce) return clearInterval(t);
+      if(++n > 20 || !vid.paused) return clearInterval(t);
       if(vid.readyState >= 3) attempt('timer').catch(() => {});
     }, 400);
   })();
@@ -465,7 +464,7 @@ html{scroll-behavior:smooth}
     r.readAsText(f);
   });
   document.getElementById('dismiss').addEventListener('click', () => { loader.hidden = true; });
-  addEventListener('click', () => { if(haveVideo && vid.paused && !reduce) vid.play().catch(()=>{}); });
+  addEventListener('click', () => { if(haveVideo && vid.paused) vid.play().catch(()=>{}); });
 
   // ---- cursor ----
   addEventListener('pointermove', e => {
