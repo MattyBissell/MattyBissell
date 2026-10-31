@@ -8,6 +8,7 @@
   --bg:#000000;
   --ink:#14130f;
   --cream:#E3DACF;
+  --stroke:3px;
   --cream-dim:#c9c5ba;
   --beige:#cfbb95;
   --leaf:#9fbf6a;
@@ -38,7 +39,7 @@ a{color:inherit}
 header{position:relative;z-index:2}
 .topbar{
   display:flex;align-items:flex-start;gap:20px;
-  padding-block:22px 14px;border-bottom:1px solid var(--cream);
+  padding-block:22px 14px;border-bottom:var(--stroke) solid var(--cream);
   position:relative;
 }
 .wordmark{
@@ -69,25 +70,45 @@ nav.desk a:focus-visible{outline:2px solid var(--leaf);outline-offset:2px}
 .burger{
   display:none;flex:0 0 auto;background:var(--cream);border:0;
   width:46px;height:40px;cursor:pointer;padding:0;align-items:center;justify-content:center;
+  position:relative;z-index:50;
 }
-.burger span{display:block;width:22px;height:2px;background:var(--ink);position:relative}
+.burger span{
+  display:block;width:22px;height:2px;background:var(--ink);position:relative;
+  transition:background .18s;
+}
 .burger span::before,.burger span::after{
   content:"";position:absolute;left:0;width:22px;height:2px;background:var(--ink);
+  transition:transform .22s ease,top .18s ease;
 }
 .burger span::before{top:-7px}
 .burger span::after{top:7px}
+/* becomes an X while the sheet is open */
+.burger[aria-expanded="true"] span{background:transparent}
+.burger[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
 
-nav.mob{display:none;flex-direction:column;gap:2px;padding-bottom:14px}
-nav.mob a{
-  background:var(--cream);color:var(--ink);text-decoration:none;
-  font-weight:500;padding:12px 16px;
+/* mobile nav: full-sheet overlay rather than a dropdown that shoves the page */
+nav.mob{
+  position:fixed;inset:0;z-index:40;background:var(--bg);
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+  padding:0 20px;
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity .22s ease,transform .22s ease,visibility .22s;
 }
-nav.mob[data-open="true"]{display:flex}
+nav.mob a{
+  font-family:var(--font-display);font-size:clamp(38px,13vw,68px);
+  line-height:1.04;letter-spacing:.01em;
+  color:var(--cream);text-decoration:none;padding:6px 0;
+  border-bottom:var(--stroke) solid transparent;
+}
+nav.mob a:active{border-bottom-color:var(--leaf);color:var(--leaf)}
+nav.mob[data-open="true"]{opacity:1;visibility:visible;transform:none}
+body[data-navopen="true"]{overflow:hidden}
 
 /* ---------- creature ---------- */
 .creature{
   position:absolute;pointer-events:none;z-index:0;
-  left:50%;top:46%;
+  left:50%;top:var(--creature-y, 54%);
   transform:translate(-50%, calc(-50% + var(--py, 0px)));
   width:min(2400px,156vw);aspect-ratio:16/9;
   will-change:transform;
@@ -96,6 +117,15 @@ nav.mob[data-open="true"]{display:flex}
   position:absolute;z-index:1;left:0;right:0;top:64%;
   border-top:1px dashed #33333d;pointer-events:none;will-change:transform;
 }
+
+/* framed hero block */
+.frame{
+  border:var(--stroke) solid var(--cream);
+  padding:30px 34px 34px;
+  max-width:760px;
+  will-change:transform;
+}
+.frame > *:last-child{margin-bottom:0}
 .creature video{
   width:100%;height:100%;object-fit:contain;display:block;
   filter:brightness(1.05);
@@ -195,16 +225,18 @@ footer{
 }
 
 @media (max-width: 900px){
-  .creature{top:44%;width:min(1400px,150vw)}
+  .creature{--creature-y:52%;width:min(1400px,150vw)}
   nav.desk a{min-width:150px;font-size:14px}
+  .c-wide,.c-side,.c-half{grid-column:span 12}   /* single column from here down */
+  .frame{max-width:none}
 }
 @media (max-width: 680px){
   nav.desk{display:none}
   .burger{display:flex}
   .topbar{align-items:center;padding-block:16px 12px}
-  .creature{width:min(1000px,185vw);top:42%}
+  .creature{width:min(1000px,185vw);--creature-y:50%}
   .hero{padding-block:30px 34px}
-  .c-wide,.c-side,.c-half{grid-column:span 12}
+  .frame{padding:22px 20px 24px}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;scroll-behavior:auto!important}
@@ -248,8 +280,10 @@ html{scroll-behavior:smooth}
 </header>
 
   <div class="shell hero">
-    <h1>Interactive media, built to be stood in front of.</h1>
-    <p>Installations, real-time graphics and immersive training work. Twenty years of digital art, currently finishing a Bachelor of Design at UniSC.</p>
+    <div class="frame">
+      <h1>Can we spark joy?</h1>
+      <p>Installations, real-time graphics and immersive training work. Twenty years of digital art, currently finishing a Bachelor of Design at UniSC.</p>
+    </div>
   </div>
 
   <a class="cue" href="#work">Work <span aria-hidden="true">&darr;</span></a>
@@ -259,27 +293,37 @@ html{scroll-behavior:smooth}
 
   <section id="work">
     <p class="eyebrow">Selected work</p>
-    <h2>Things I have made</h2>
+    <h2>Interactions</h2>
     <div class="grid">
       <a class="card c-wide" href="#">
         <h3>Fiddlearm</h3>
-        <p>A presence-responsive creature-weed. MediaPipe pose tracking through TouchDesigner into Unreal Engine 5. It opens for people who stay with it.</p>
-        <span class="tag">DES309 capstone · 2026</span>
+        <p>A presence-responsive creature-weed on a gallery monitor. MediaPipe pose data runs through TouchDesigner into Unreal Engine 5, so the plant answers to where you stand and how you move. There is no correct input. It opens for people who stay with it.</p>
+        <span class="tag">DES309 capstone · TouchDesigner · UE5</span>
       </a>
       <a class="card beige c-side" href="#">
         <h3>Hello Stranger</h3>
-        <p>An escalating response to stillness. The counterpart piece, and the one this grew out of.</p>
-        <span class="tag">Installation</span>
+        <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
+        <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
       </a>
       <a class="card dark c-half" href="#">
+        <h3>Varsity VR Training</h3>
+        <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
+        <span class="tag">Maya · Substance · Unity · 25,780 tris</span>
+      </a>
+      <a class="card c-half" href="#">
+        <h3>Keeper</h3>
+        <p>A lighthouse diorama with character and vehicle studies alongside it. Self-directed, full pipeline from block-out through to 2K PBR across three UDIM tiles.</p>
+        <span class="tag">Case study · 2024 · 39,257 tris</span>
+      </a>
+      <a class="card beige c-side" href="#">
+        <h3>The Moving Feast</h3>
+        <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
+        <span class="tag">Brand identity · Industrial concept</span>
+      </a>
+      <a class="card dark c-wide" href="#">
         <h3>Whitsunday In Motion</h3>
         <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
         <span class="tag">BCI304 · Team project</span>
-      </a>
-      <a class="card c-half" href="#">
-        <h3>Placeholder project</h3>
-        <p>Swap this for something from the THQ years or the Bondi Labs simulation work.</p>
-        <span class="tag">Replace me</span>
       </a>
     </div>
   </section>
@@ -443,6 +487,55 @@ html{scroll-behavior:smooth}
       if(vid.readyState >= 3) attempt('timer').catch(() => {});
     }, 400);
   })();
+
+  // ---- breath: every so often the loop slows into a near-stop ----
+  // Decouples the sense of rhythm from the clip length, so the 18s period
+  // never surfaces. The eye follows automatically, since it reads currentTime.
+  const BREATH = {
+    waitMin: 11000, waitMax: 26000,   // gap between holds
+    down: 1900,                       // time to bleed off speed
+    holdMin: 900, holdMax: 2800,      // length of the near-stop
+    up: 2400,                         // time to come back
+    low: 0.06,                        // rate held at: not 0, so it still drifts
+    phase: 'wait'
+  };
+  window.__breath = BREATH;
+
+  (function breath(){
+    const B = BREATH;
+    const rand = (a, b) => a + Math.random() * (b - a);
+    const smooth = k => k * k * (3 - 2 * k);   // gentle at both ends
+    let t0 = performance.now(), wait = rand(B.waitMin, B.waitMax), hold = 0;
+
+    B.trigger = function(){ B.phase = 'down'; t0 = performance.now(); };
+
+    function step(now){
+      requestAnimationFrame(step);
+      if(vid.paused || reduce){ t0 = now; return; }
+      const e = now - t0;
+
+      if(B.phase === 'wait'){
+        if(e > wait){ B.phase = 'down'; t0 = now; }
+
+      } else if(B.phase === 'down'){
+        const k = Math.min(1, e / B.down);
+        vid.playbackRate = 1 + (B.low - 1) * smooth(k);
+        if(k >= 1){ B.phase = 'hold'; t0 = now; hold = rand(B.holdMin, B.holdMax); }
+
+      } else if(B.phase === 'hold'){
+        if(e > hold){ B.phase = 'up'; t0 = now; }
+
+      } else {
+        const k = Math.min(1, e / B.up);
+        vid.playbackRate = B.low + (1 - B.low) * smooth(k);
+        if(k >= 1){
+          vid.playbackRate = 1;
+          B.phase = 'wait'; t0 = now; wait = rand(B.waitMin, B.waitMax);
+        }
+      }
+    }
+    requestAnimationFrame(step);
+  })();
   attachVideo(VIDEO_SRC);
   fetch(TRACK_SRC).then(r => r.ok ? r.json() : Promise.reject()).then(setTrack).catch(ready);
   setTimeout(() => { if(!(track && haveVideo)) loader.hidden = false; }, 900);
@@ -547,6 +640,7 @@ html{scroll-behavior:smooth}
       vid.pause();
       vid.currentTime = (vid.currentTime + 1 / FPS) % (vid.duration || 1);
     });
+    btn('breathe', () => BREATH.trigger());
     btn('reload src', () => {
       const s = vid.currentSrc || VIDEO_SRC;
       vid.removeAttribute('src');
@@ -574,26 +668,29 @@ html{scroll-behavior:smooth}
         'fps assumed ' + FPS + '\n' +
         'gestures    ' + RQ.gestures + '\n' +
         'play calls  ' + RQ.attempts + '\n' +
-        'last result ' + RQ.last;
+        'last result ' + RQ.last + '\n' +
+        'rate        ' + vid.playbackRate.toFixed(3) + '\n' +
+        'breath      ' + BREATH.phase;
     }, 200);
   }
 
   // ---- mobile nav ----
   const burger = document.getElementById('burger');
   const mob = document.getElementById('mobnav');
-  burger.addEventListener('click', () => {
-    const open = mob.dataset.open === 'true';
-    mob.dataset.open = String(!open);
-    burger.setAttribute('aria-expanded', String(!open));
-  });
-  mob.addEventListener('click', e => {
-    if(e.target.tagName === 'A'){ mob.dataset.open = 'false'; burger.setAttribute('aria-expanded','false'); }
-  });
+  function setNav(open){
+    mob.dataset.open = String(open);
+    burger.setAttribute('aria-expanded', String(open));
+    document.body.dataset.navopen = String(open);   // locks scroll behind the sheet
+  }
+  burger.addEventListener('click', () => setNav(mob.dataset.open !== 'true'));
+  mob.addEventListener('click', e => { if(e.target.tagName === 'A') setNav(false); });
+  addEventListener('keydown', e => { if(e.key === 'Escape') setNav(false); });
 
   // ---- parallax, first slide only ----
   const head = document.querySelector('header');
   const hero = document.querySelector('.hero');
   const rule = document.querySelector('.rule');
+  const frameText = document.querySelectorAll('.frame > *');
   let queued = false;
 
   function parallax(){
@@ -604,6 +701,9 @@ html{scroll-behavior:smooth}
     if(rule) rule.style.transform = `translateY(${(y * 0.62).toFixed(1)}px)`;
     if(hero) hero.style.transform = `translateY(${(y * -0.14).toFixed(1)}px)`;
     if(head) head.style.transform = `translateY(${(y * -0.05).toFixed(1)}px)`;
+    // text lags the frame slightly, so the two separate as you scroll
+    const lag = (y * 0.07).toFixed(1) + 'px';
+    frameText.forEach(n => { n.style.transform = `translateY(${lag})`; });
   }
   if(!reduce){
     addEventListener('scroll', () => {
