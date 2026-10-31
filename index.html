@@ -400,6 +400,30 @@ html{scroll-behavior:smooth}
   // fetch() fails outright on file://, so the video is attached directly and
   // judged by its own error event rather than a HEAD probe
   vid.addEventListener('error', () => { if(!haveVideo) ready(); }, {once:true});
+
+  // ---- autoplay rescue ----
+  // Edge and Safari refuse muted autoplay until the site has interaction
+  // history. Retry on the first gesture of any kind, then stop listening.
+  (function rescue(){
+    const evts = ['pointerdown','keydown','touchstart','scroll','wheel'];
+    function go(){
+      if(reduce) return drop();
+      vid.play().then(drop).catch(() => {});
+    }
+    function drop(){
+      evts.forEach(e => removeEventListener(e, go));
+      document.removeEventListener('visibilitychange', vis);
+    }
+    function vis(){ if(!document.hidden) go(); }
+    evts.forEach(e => addEventListener(e, go, {passive:true}));
+    document.addEventListener('visibilitychange', vis);
+    // and keep nudging it for the first few seconds in case the policy lifts
+    let n = 0;
+    const t = setInterval(() => {
+      if(++n > 20 || !vid.paused || reduce) return clearInterval(t);
+      if(vid.readyState >= 3) vid.play().catch(() => {});
+    }, 400);
+  })();
   attachVideo(VIDEO_SRC);
   fetch(TRACK_SRC).then(r => r.ok ? r.json() : Promise.reject()).then(setTrack).catch(ready);
   setTimeout(() => { if(!(track && haveVideo)) loader.hidden = false; }, 900);
