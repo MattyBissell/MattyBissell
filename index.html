@@ -462,6 +462,33 @@ html{scroll-behavior:smooth}
   }
   requestAnimationFrame(tick);
 
+  // ---- diagnostics: add #debug to the URL ----
+  if(location.hash === '#debug'){
+    const d = document.createElement('pre');
+    d.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:99;margin:0;' +
+      'padding:10px 12px;background:#000;border:1px solid #9fbf6a;color:#9fbf6a;' +
+      'font:11.5px/1.5 ui-monospace,monospace;white-space:pre;pointer-events:none';
+    document.body.appendChild(d);
+    const RS = ['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'];
+    const NS = ['EMPTY','IDLE','LOADING','NO_SOURCE'];
+    setInterval(() => {
+      d.textContent =
+        'src       ' + (vid.currentSrc || '(none)').split('/').pop() + '\n' +
+        'readyState  ' + vid.readyState + ' ' + (RS[vid.readyState] || '') + '\n' +
+        'network     ' + vid.networkState + ' ' + (NS[vid.networkState] || '') + '\n' +
+        'paused      ' + vid.paused + '\n' +
+        'ended       ' + vid.ended + '\n' +
+        'loop        ' + vid.loop + '\n' +
+        'muted       ' + vid.muted + '\n' +
+        'time        ' + vid.currentTime.toFixed(3) + ' / ' +
+          (isFinite(vid.duration) ? vid.duration.toFixed(3) : '?') + '\n' +
+        'size        ' + vid.videoWidth + ' x ' + vid.videoHeight + '\n' +
+        'error       ' + (vid.error ? vid.error.code + ' ' + vid.error.message : 'none') + '\n' +
+        'track       ' + (track ? track.length + ' frames' : 'NOT LOADED') + '\n' +
+        'fps assumed ' + FPS;
+    }, 200);
+  }
+
   // ---- mobile nav ----
   const burger = document.getElementById('burger');
   const mob = document.getElementById('mobnav');
