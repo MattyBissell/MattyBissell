@@ -404,24 +404,44 @@ html{scroll-behavior:smooth}
   // ---- autoplay rescue ----
   // Edge and Safari refuse muted autoplay until the site has interaction
   // history. Retry on the first gesture of any kind, then stop listening.
+  const RQ = { gestures: 0, attempts: 0, last: '-', from: '-' };
+  window.__rq = RQ;
+
+  function attempt(src){
+    RQ.attempts++;
+    RQ.from = src;
+    let p;
+    try {
+      p = vid.play();
+    } catch(err){
+      RQ.last = 'threw ' + err.name + ': ' + err.message;
+      return Promise.reject(err);
+    }
+    if(!p || !p.then){ RQ.last = 'no promise returned'; return Promise.resolve(); }
+    return p.then(() => { RQ.last = 'ok from ' + src; })
+            .catch(err => { RQ.last = err.name + ' from ' + src; throw err; });
+  }
+
   (function rescue(){
-    const evts = ['pointerdown','keydown','touchstart','scroll','wheel'];
-    function go(){
+    const evts = ['pointerdown','pointerup','click','keydown','touchstart','touchend','scroll','wheel'];
+    function go(e){
+      RQ.gestures++;
       if(reduce) return drop();
-      vid.play().then(drop).catch(() => {});
+      attempt(e && e.type || 'gesture').then(drop).catch(() => {});
     }
     function drop(){
-      evts.forEach(e => removeEventListener(e, go));
+      evts.forEach(e => removeEventListener(e, go, true));
       document.removeEventListener('visibilitychange', vis);
     }
-    function vis(){ if(!document.hidden) go(); }
-    evts.forEach(e => addEventListener(e, go, {passive:true}));
+    function vis(){ if(!document.hidden) go({type:'visibility'}); }
+    // capture phase, so nothing downstream can stop it reaching here
+    evts.forEach(e => addEventListener(e, go, true));
     document.addEventListener('visibilitychange', vis);
     // and keep nudging it for the first few seconds in case the policy lifts
     let n = 0;
     const t = setInterval(() => {
       if(++n > 20 || !vid.paused || reduce) return clearInterval(t);
-      if(vid.readyState >= 3) vid.play().catch(() => {});
+      if(vid.readyState >= 3) attempt('timer').catch(() => {});
     }, 400);
   })();
   attachVideo(VIDEO_SRC);
@@ -552,7 +572,10 @@ html{scroll-behavior:smooth}
         'size        ' + vid.videoWidth + ' x ' + vid.videoHeight + '\n' +
         'error       ' + (vid.error ? vid.error.code + ' ' + vid.error.message : 'none') + '\n' +
         'track       ' + (track ? track.length + ' frames' : 'NOT LOADED') + '\n' +
-        'fps assumed ' + FPS;
+        'fps assumed ' + FPS + '\n' +
+        'gestures    ' + RQ.gestures + '\n' +
+        'play calls  ' + RQ.attempts + '\n' +
+        'last result ' + RQ.last;
     }, 200);
   }
 
