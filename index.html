@@ -1,0 +1,471 @@
+<title>Matty Bissell</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
+<style>
+/* Dark-committed, matching the Blender comp. Creature is an element, not a background,
+   so the eye maps to its box in percent and nothing crops. */
+:root{
+  --bg:#000000;
+  --ink:#14130f;
+  --cream:#e9e6de;
+  --cream-dim:#c9c5ba;
+  --beige:#cfbb95;
+  --leaf:#9fbf6a;
+  --line:#2a2a30;
+  --muted:#7d7a85;
+  --font-display:"Anton",Impact,"Arial Narrow",sans-serif;
+  --font-ui:"Archivo",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--cream);
+  font-family:var(--font-ui);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 0;
+  -webkit-font-smoothing:antialiased;
+}
+.shell{max-width:1180px;margin:0 auto}
+a{color:inherit}
+
+/* ---------- header ---------- */
+/* first slide: header, creature and intro share one full-height screen */
+.slide{
+  position:relative;min-height:100svh;overflow:hidden;
+  display:flex;flex-direction:column;padding-bottom:64px;
+}
+header{position:relative;z-index:2}
+.topbar{
+  display:flex;align-items:flex-start;gap:20px;
+  padding-block:22px 14px;border-bottom:1px solid var(--cream);
+  position:relative;
+}
+.wordmark{flex:0 0 auto;text-decoration:none;display:block}
+.wordmark .name{
+  font-family:var(--font-display);font-size:clamp(34px,6.4vw,62px);
+  line-height:.86;letter-spacing:.012em;
+  background:var(--cream);color:var(--ink);
+  padding:.06em .16em .1em;display:block;
+}
+.wordmark .sur{
+  font-family:var(--font-ui);font-weight:600;
+  font-size:clamp(12px,2.1vw,20px);letter-spacing:.42em;
+  background:var(--cream);color:var(--ink);
+  padding:.26em .2em .26em .34em;display:block;margin-top:3px;
+}
+.spacer{flex:1 1 auto;min-width:0}
+
+nav.desk{display:flex;flex-direction:column;gap:3px;flex:0 0 auto;padding-top:4px}
+nav.desk a{
+  background:var(--cream);color:var(--ink);text-decoration:none;
+  font-size:15px;font-weight:500;padding:9px 26px 9px 16px;
+  min-width:190px;transition:background .15s,color .15s;
+}
+nav.desk a:hover,nav.desk a:focus-visible{background:var(--beige)}
+nav.desk a:focus-visible{outline:2px solid var(--leaf);outline-offset:2px}
+
+.burger{
+  display:none;flex:0 0 auto;background:var(--cream);border:0;
+  width:46px;height:40px;cursor:pointer;padding:0;align-items:center;justify-content:center;
+}
+.burger span{display:block;width:22px;height:2px;background:var(--ink);position:relative}
+.burger span::before,.burger span::after{
+  content:"";position:absolute;left:0;width:22px;height:2px;background:var(--ink);
+}
+.burger span::before{top:-7px}
+.burger span::after{top:7px}
+
+nav.mob{display:none;flex-direction:column;gap:2px;padding-bottom:14px}
+nav.mob a{
+  background:var(--cream);color:var(--ink);text-decoration:none;
+  font-weight:500;padding:12px 16px;
+}
+nav.mob[data-open="true"]{display:flex}
+
+/* ---------- creature ---------- */
+.creature{
+  position:absolute;pointer-events:none;z-index:0;
+  left:50%;top:46%;
+  transform:translate(-50%, calc(-50% + var(--py, 0px)));
+  width:min(2400px,156vw);aspect-ratio:16/9;
+  will-change:transform;
+}
+.rule{
+  position:absolute;z-index:1;left:0;right:0;top:64%;
+  border-top:1px dashed #33333d;pointer-events:none;will-change:transform;
+}
+.creature video{
+  width:100%;height:100%;object-fit:contain;display:block;
+  filter:brightness(1.05);
+}
+.eye{
+  position:absolute;transform:translate(-50%,-50%);
+  width:clamp(13px,1.5vw,21px);aspect-ratio:1;border-radius:50%;
+  background:#f6f3ea;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 14px rgba(190,220,255,.4),0 0 3px rgba(255,255,255,.9);
+  opacity:0;transition:opacity .5s ease;
+}
+.eye[data-ready="true"]{opacity:1}
+.eye i{display:block;width:30%;height:30%;border-radius:50%;background:#16301b;will-change:transform}
+
+/* ---------- hero ---------- */
+.hero{margin-top:auto;position:relative;z-index:2;padding-block:0 8px}
+.cue{
+  position:relative;z-index:2;align-self:flex-start;
+  margin:26px auto 0 0;padding:0 0 0 max(16px,env(safe-area-inset-left,0px));
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;
+  color:var(--muted);text-decoration:none;
+}
+.cue:hover{color:var(--cream)}
+.cue span{display:inline-block;margin-left:6px;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.hero h1{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(30px,5.6vw,58px);line-height:1.04;margin:0 0 18px;
+  max-width:16ch;text-wrap:balance;letter-spacing:.01em;
+}
+.hero p{font-size:clamp(15px,1.5vw,18px);color:var(--cream-dim);max-width:52ch;margin:0}
+
+/* ---------- sections ---------- */
+section{padding-block:52px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.eyebrow{
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);
+  margin:0 0 14px;font-weight:600;
+}
+h2{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(24px,3.4vw,38px);margin:0 0 22px;letter-spacing:.01em;
+}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{
+  background:var(--cream);color:var(--ink);
+  padding:20px;display:flex;flex-direction:column;gap:8px;
+  text-decoration:none;min-width:0;
+}
+.card.beige{background:var(--beige)}
+.card.dark{background:#17171c;color:var(--cream);border:1px solid var(--line)}
+.card h3{margin:0;font-size:19px;font-weight:600;line-height:1.25}
+.card p{margin:0;font-size:14px;line-height:1.5;opacity:.82}
+.card .tag{
+  font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+  font-weight:600;opacity:.6;margin-top:auto;padding-top:14px;
+}
+.c-wide{grid-column:span 7}
+.c-side{grid-column:span 5}
+.c-half{grid-column:span 6}
+.c-full{grid-column:span 12}
+
+.prose{max-width:62ch}
+.prose p{margin:0 0 14px;color:var(--cream-dim)}
+.contact a{
+  display:inline-block;background:var(--cream);color:var(--ink);
+  text-decoration:none;font-weight:600;padding:11px 20px;margin:0 8px 8px 0;
+}
+.contact a:hover{background:var(--leaf)}
+footer{
+  border-top:1px solid var(--line);padding-block:26px 40px;
+  font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;
+}
+
+/* ---------- dev loader ---------- */
+.loader{
+  position:fixed;left:max(16px,env(safe-area-inset-left,0px));
+  bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:90;
+  background:#15151d;border:1px solid var(--line);border-radius:4px;
+  padding:13px 15px;font-size:12.5px;max-width:min(330px,calc(100vw - 32px));
+}
+.loader strong{display:block;font-size:13px;margin-bottom:5px;color:var(--cream)}
+.loader p{margin:0 0 10px;color:var(--muted);line-height:1.5}
+.loader label{
+  display:inline-flex;align-items:center;position:relative;cursor:pointer;
+  background:#1f1f29;border:1px solid var(--line);border-radius:3px;
+  padding:6px 11px;margin:0 6px 6px 0;font-size:12px;color:var(--cream);
+}
+.loader label:hover{border-color:var(--leaf)}
+.loader label.ok{border-color:var(--leaf);color:var(--leaf)}
+.loader input{position:absolute;width:1px;height:1px;opacity:0}
+.loader button{
+  background:none;border:0;color:var(--muted);cursor:pointer;
+  font-size:11px;text-decoration:underline;padding:2px 0;font-family:inherit;
+}
+
+@media (max-width: 900px){
+  .creature{top:44%;width:min(1400px,150vw)}
+  nav.desk a{min-width:150px;font-size:14px}
+}
+@media (max-width: 680px){
+  nav.desk{display:none}
+  .burger{display:flex}
+  .topbar{align-items:center;padding-block:16px 12px}
+  .creature{width:min(1000px,185vw);top:42%}
+  .hero{padding-block:30px 34px}
+  .c-wide,.c-side,.c-half{grid-column:span 12}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;scroll-behavior:auto!important}
+}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="slide" id="top">
+
+  <div class="creature" id="creature">
+    <video id="vid" muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <div class="eye" id="eye"><i id="pupil"></i></div>
+  </div>
+  <div class="rule" aria-hidden="true"></div>
+
+<header>
+  <div class="shell">
+    <div class="topbar">
+      <a class="wordmark" href="#top" aria-label="Matty Bissell, home">
+        <span class="name">MATTY</span>
+        <span class="sur">BISSELL</span>
+      </a>
+
+      <div class="spacer"></div>
+
+      <nav class="desk" aria-label="Primary">
+        <a href="#work">Work</a>
+        <a href="#me">Me</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="mobnav" aria-label="Menu">
+        <span></span>
+      </button>
+    </div>
+    <nav class="mob" id="mobnav" data-open="false" aria-label="Primary, mobile">
+      <a href="#work">Work</a>
+      <a href="#me">Me</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+  <div class="shell hero">
+    <h1>Interactive media, built to be stood in front of.</h1>
+    <p>Installations, real-time graphics and immersive training work. Twenty years of digital art, currently finishing a Bachelor of Design at UniSC.</p>
+  </div>
+
+  <a class="cue" href="#work">Work <span aria-hidden="true">&darr;</span></a>
+</div>
+
+<main class="shell">
+
+  <section id="work">
+    <p class="eyebrow">Selected work</p>
+    <h2>Things I have made</h2>
+    <div class="grid">
+      <a class="card c-wide" href="#">
+        <h3>Fiddlearm</h3>
+        <p>A presence-responsive creature-weed. MediaPipe pose tracking through TouchDesigner into Unreal Engine 5. It opens for people who stay with it.</p>
+        <span class="tag">DES309 capstone · 2026</span>
+      </a>
+      <a class="card beige c-side" href="#">
+        <h3>Hello Stranger</h3>
+        <p>An escalating response to stillness. The counterpart piece, and the one this grew out of.</p>
+        <span class="tag">Installation</span>
+      </a>
+      <a class="card dark c-half" href="#">
+        <h3>Whitsunday In Motion</h3>
+        <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
+        <span class="tag">BCI304 · Team project</span>
+      </a>
+      <a class="card c-half" href="#">
+        <h3>Placeholder project</h3>
+        <p>Swap this for something from the THQ years or the Bondi Labs simulation work.</p>
+        <span class="tag">Replace me</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="me">
+    <p class="eyebrow">About</p>
+    <h2>Me</h2>
+    <div class="prose">
+      <p>I build things people interact with. Nine years at THQ as a Senior Artist across eight shipped games, then immersive training products at Bondi Labs and Powercor, and now a Bachelor of Design at UniSC majoring in Interactive Media.</p>
+      <p>The work tends toward systems that reward attention rather than rewarding input. Placeholder paragraph — replace with your own.</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <p class="eyebrow">Get in touch</p>
+    <h2>Contact</h2>
+    <div class="contact">
+      <a href="#">Email</a>
+      <a href="#">LinkedIn</a>
+      <a href="#">Process journal</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="shell">
+  <span>Matty Bissell</span>
+  <span>Brisbane, Australia</span>
+</footer>
+
+<div class="loader" id="loader" hidden>
+  <strong>Preview mode</strong>
+  <p>The render and track aren't at their relative paths, so load them here to see the eye working.</p>
+  <p id="stat" style="font-family:ui-monospace,monospace;font-size:11.5px;color:#9fbf6a;margin-bottom:10px"></p>
+  <label id="lv">Render<input type="file" id="fv" accept="video/*"></label>
+  <label id="lt">Track<input type="file" id="ft" accept=".json,application/json"></label>
+  <button type="button" id="dismiss">Hide</button>
+</div>
+
+<script>
+(function(){
+  // ---- where the assets live once this is deployed ----
+  const VIDEO_SRC = 'assets/fiddlearm_loop.mp4';
+  const TRACK_SRC = 'assets/eye_track.json';
+  const FPS       = 24;
+
+  const vid = document.getElementById('vid');
+  const eye = document.getElementById('eye');
+  const pup = document.getElementById('pupil');
+  const box = document.getElementById('creature');
+  const loader = document.getElementById('loader');
+
+  let track = null, haveVideo = false;
+  let px = 0, py = 0, cx = 0.5, cy = 0.5, pointerSeen = false;
+  let glance = {x:0, y:0}, glanceAt = 0;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const stat = document.getElementById('stat');
+  function say(m){ if(stat) stat.textContent = m; }
+
+  function ready(){
+    say((track ? 'track ok' : 'track missing') + '  ·  ' + (haveVideo ? 'render ok' : 'render missing'));
+    if(track && haveVideo){
+      loader.hidden = true;
+      eye.dataset.ready = 'true';
+    }
+  }
+
+  // one place that attaches a source, so the deployed path and the picker behave the same
+  function attachVideo(src){
+    function onMeta(){
+      vid.removeEventListener('loadedmetadata', onMeta);
+      if(vid.videoWidth) box.style.aspectRatio = vid.videoWidth + ' / ' + vid.videoHeight;
+      haveVideo = true;
+      ready();
+      if(!reduce) vid.play().catch(() => say('render ok · click the page to start it'));
+    }
+    vid.addEventListener('loadedmetadata', onMeta);
+    vid.addEventListener('canplay', () => { if(!reduce) vid.play().catch(()=>{}); }, {once:true});
+    vid.src = src;
+    vid.load();
+  }
+
+  function setTrack(raw){
+    track = raw.map(p => Array.isArray(p) ? {x:+p[0], y:+p[1]} : {x:+p.x, y:+p.y});
+    ready();
+  }
+
+  // ---- try the deployed paths ----
+  // fetch() fails outright on file://, so the video is attached directly and
+  // judged by its own error event rather than a HEAD probe
+  vid.addEventListener('error', () => { if(!haveVideo) ready(); }, {once:true});
+  attachVideo(VIDEO_SRC);
+  fetch(TRACK_SRC).then(r => r.ok ? r.json() : Promise.reject()).then(setTrack).catch(ready);
+  setTimeout(() => { if(!(track && haveVideo)) loader.hidden = false; }, 900);
+
+  // ---- preview loading ----
+  document.getElementById('fv').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    document.getElementById('lv').classList.add('ok');
+    say('reading render…');
+    attachVideo(URL.createObjectURL(f));
+  });
+  document.getElementById('ft').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{ setTrack(JSON.parse(r.result)); document.getElementById('lt').classList.add('ok'); }
+      catch(err){ say('track JSON would not parse'); }
+    };
+    r.readAsText(f);
+  });
+  document.getElementById('dismiss').addEventListener('click', () => { loader.hidden = true; });
+  addEventListener('click', () => { if(haveVideo && vid.paused && !reduce) vid.play().catch(()=>{}); });
+
+  // ---- cursor ----
+  addEventListener('pointermove', e => {
+    const r = box.getBoundingClientRect();
+    if(!r.width) return;
+    cx = (e.clientX - r.left)/r.width;
+    cy = (e.clientY - r.top)/r.height;
+    pointerSeen = true;
+  }, {passive:true});
+
+  // ---- the loop ----
+  function tick(){
+    if(track && track.length && haveVideo){
+      const i = ((Math.floor(vid.currentTime * FPS) % track.length) + track.length) % track.length;
+      const p = track[i];
+      eye.style.left = (p.x * 100) + '%';
+      eye.style.top  = (p.y * 100) + '%';
+
+      // look at the cursor when it's near, otherwise glance about
+      let tx = 0, ty = 0;
+      const d = Math.hypot(cx - p.x, cy - p.y);
+      if(pointerSeen && d < 1.1){
+        tx = cx - p.x; ty = cy - p.y;
+      } else if(performance.now() > glanceAt){
+        const a = Math.random() * Math.PI * 2;
+        glance = {x:Math.cos(a)*0.08, y:Math.sin(a)*0.08};
+        glanceAt = performance.now() + 1600 + Math.random()*4200;
+      }
+      if(!(pointerSeen && d < 1.1)){ tx = glance.x; ty = glance.y; }
+
+      const m = Math.hypot(tx, ty) || 1;
+      const reach = Math.min(1, m / 0.3) * (eye.offsetWidth * 0.26);
+      px += ((tx/m)*reach - px) * 0.12;
+      py += ((ty/m)*reach - py) * 0.12;
+      pup.style.transform = `translate(${px.toFixed(2)}px, ${py.toFixed(2)}px)`;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // ---- mobile nav ----
+  const burger = document.getElementById('burger');
+  const mob = document.getElementById('mobnav');
+  burger.addEventListener('click', () => {
+    const open = mob.dataset.open === 'true';
+    mob.dataset.open = String(!open);
+    burger.setAttribute('aria-expanded', String(!open));
+  });
+  mob.addEventListener('click', e => {
+    if(e.target.tagName === 'A'){ mob.dataset.open = 'false'; burger.setAttribute('aria-expanded','false'); }
+  });
+
+  // ---- parallax, first slide only ----
+  const head = document.querySelector('header');
+  const hero = document.querySelector('.hero');
+  const rule = document.querySelector('.rule');
+  let queued = false;
+
+  function parallax(){
+    queued = false;
+    const y = scrollY;
+    if(y > innerHeight * 1.3) return;          // stop once the slide is gone
+    box.style.setProperty('--py', (y * 0.34).toFixed(1) + 'px');
+    if(rule) rule.style.transform = `translateY(${(y * 0.62).toFixed(1)}px)`;
+    if(hero) hero.style.transform = `translateY(${(y * -0.14).toFixed(1)}px)`;
+    if(head) head.style.transform = `translateY(${(y * -0.05).toFixed(1)}px)`;
+  }
+  if(!reduce){
+    addEventListener('scroll', () => {
+      if(!queued){ queued = true; requestAnimationFrame(parallax); }
+    }, {passive:true});
+    parallax();
+  }
+})();
+</script>
