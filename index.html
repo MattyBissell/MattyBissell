@@ -7,7 +7,7 @@
 :root{
   --bg:#000000;
   --ink:#14130f;
-  --cream:#e9e6de;
+  --cream:#E3DACF;
   --cream-dim:#c9c5ba;
   --beige:#cfbb95;
   --leaf:#9fbf6a;
@@ -41,19 +41,20 @@ header{position:relative;z-index:2}
   padding-block:22px 14px;border-bottom:1px solid var(--cream);
   position:relative;
 }
-.wordmark{flex:0 0 auto;text-decoration:none;display:block}
-.wordmark .name{
-  font-family:var(--font-display);font-size:clamp(34px,6.4vw,62px);
-  line-height:.86;letter-spacing:.012em;
-  background:var(--cream);color:var(--ink);
-  padding:.06em .16em .1em;display:block;
+.wordmark{
+  flex:0 0 auto;text-decoration:none;display:block;
+  color:var(--cream);              /* <- the wordmark colour lives here */
+  transition:color .15s;
 }
-.wordmark .sur{
-  font-family:var(--font-ui);font-weight:600;
-  font-size:clamp(12px,2.1vw,20px);letter-spacing:.42em;
-  background:var(--cream);color:var(--ink);
-  padding:.26em .2em .26em .34em;display:block;margin-top:3px;
+.wordmark:hover{color:var(--leaf)}
+.wordmark img,
+.wordmark svg{
+  display:block;
+  width:clamp(190px,34vw,340px);
+  height:auto;
 }
+.wordmark svg{fill:currentColor}
+.wordmark svg *{fill:inherit}
 .spacer{flex:1 1 auto;min-width:0}
 
 nav.desk{display:flex;flex-direction:column;gap:3px;flex:0 0 auto;padding-top:4px}
@@ -223,8 +224,7 @@ html{scroll-behavior:smooth}
   <div class="shell">
     <div class="topbar">
       <a class="wordmark" href="#top" aria-label="Matty Bissell, home">
-        <span class="name">MATTY</span>
-        <span class="sur">BISSELL</span>
+        <img src="images/header_MattyWordmark_V1.svg" alt="Matty Bissell">
       </a>
 
       <div class="spacer"></div>
@@ -322,9 +322,37 @@ html{scroll-behavior:smooth}
 <script>
 (function(){
   // ---- where the assets live once this is deployed ----
-  const VIDEO_SRC = 'assets/fiddlearm_loop.mp4';
-  const TRACK_SRC = 'assets/eye_track.json';
+  const VIDEO_SRC = 'media/anim_idle_v1.mp4';
+  const TRACK_SRC = 'media/anim_idle_v1.json';
+  const MARK_SRC  = 'images/header_MattyWordmark_V1.svg';
   const FPS       = 24;
+
+  // ---- inline the wordmark so its colour comes from CSS ----
+  // Leaves the <img> in place if this fails (file:// or a 404), so it
+  // always renders, just locked to the fill baked into the file.
+  (function inlineMark(){
+    const link = document.querySelector('.wordmark');
+    if(!link) return;
+    fetch(MARK_SRC)
+      .then(r => r.ok ? r.text() : Promise.reject())
+      .then(txt => {
+        const svg = new DOMParser()
+          .parseFromString(txt, 'image/svg+xml')
+          .querySelector('svg');
+        if(!svg) return;
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+        svg.setAttribute('fill', 'currentColor');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.querySelectorAll('[fill]').forEach(n => n.removeAttribute('fill'));
+        svg.querySelectorAll('[style]').forEach(n => {
+          n.style.removeProperty('fill');
+        });
+        link.replaceChildren(svg);
+      })
+      .catch(() => {});
+  })();
 
   const vid = document.getElementById('vid');
   const eye = document.getElementById('eye');
