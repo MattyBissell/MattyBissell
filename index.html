@@ -254,6 +254,12 @@ video.thumb{pointer-events:none}
 }
 .panel .out:hover{background:var(--leaf);color:#0b0b0d}
 .panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.panel .note a{
+  color:var(--cream);text-decoration:underline;
+  text-underline-offset:3px;text-decoration-color:var(--leaf);
+  text-decoration-thickness:2px;
+}
+.panel .note a:hover{color:var(--leaf)}
 .panel .clip{
   display:block;width:100%;max-width:380px;height:auto;
   border:1px solid var(--line);background:#0d0d0d;
@@ -390,8 +396,7 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-fiddlearm"><div><div class="inner">
-          <p class="note">The creature at the top of this page is the piece, rebuilt for the web from the same Blender rig. The installation ran on a 55-inch monitor in a shared gallery room, driven live by pose tracking.</p>
-          <a class="out" href="journal.html">Process journal <span aria-hidden="true">&#8599;</span></a>
+          <p class="note">The creature at the top of this page is the piece, rebuilt for the web from the same Blender rig. The installation ran on a 55-inch monitor in a shared gallery room, driven live by pose tracking. The whole build is written up in the <a href="journal.html">process journal</a>.</p>
         </div></div></div>
       </div>
 
@@ -556,8 +561,8 @@ html{scroll-behavior:smooth}
       // the first 24 frames hold on the idle pose; skipping them makes the
       // descent answer the scroll straight away
       fps:24, loop:false, startAt:1.0,
-      holdFor:0.3,      // pause this far in
-      resumeAt:0.34     // and resume once the scroll passes this much of a screen
+      holdFor:0.4,       // pause this far into the clip, on the first reach
+      resumeAfter:0.9    // and wait until this much MORE of a screen is scrolled
     }
   };
 
@@ -754,7 +759,7 @@ html{scroll-behavior:smooth}
   const turb = document.getElementById('turb');
   const disp = document.getElementById('disp');
   let boilAt = 0, boilSwapped = false, boilTo = null, lastSeed = 0, filterOn = false;
-  let holding = false;
+  let holding = false, trippedAt = 0;
   const smoothK = k => k * k * (3 - 2 * k);
 
   function startBoil(to){
@@ -771,6 +776,7 @@ html{scroll-behavior:smooth}
       vidD.hidden = false;
       vidD.currentTime = CLIPS.down.startAt;
       holding = true;                 // released when the scroll carries on
+      trippedAt = scrollY;            // measured from here, not from the top
       vidD.play().catch(() => {});
     } else {
       vidD.pause();
@@ -812,7 +818,8 @@ html{scroll-behavior:smooth}
     const y = scrollY / innerHeight;
     if(state === 'idle' && y > TRIP_DOWN) startBoil('down');
     else if(state === 'down' && y < TRIP_UP) startBoil('idle');
-    else if(state === 'down' && holding && y > CLIPS.down.resumeAt){
+    else if(state === 'down' && holding &&
+            scrollY - trippedAt > CLIPS.down.resumeAfter * innerHeight){
       holding = false;
       vidD.play().catch(() => {});
     }
