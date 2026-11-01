@@ -108,7 +108,7 @@ body[data-navopen="true"]{overflow:hidden}
 /* ---------- creature ---------- */
 .creature{
   position:absolute;pointer-events:none;z-index:0;
-  left:50%;top:var(--creature-y, 74%);
+  left:50%;top:var(--creature-y, 84%);
   transform:translate(-50%, calc(-50% + var(--py, 0px)));
   width:min(2400px,156vw);aspect-ratio:16/9;
   will-change:transform;
@@ -204,8 +204,9 @@ h2{
 .card{position:relative;padding:0;gap:0}
 .card .thumb{
   display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
-  background:#0d0d0d;
+  object-position:center;background:#0d0d0d;
 }
+video.thumb{pointer-events:none}
 .card .body{display:flex;flex-direction:column;gap:8px;padding:18px 20px 16px;flex:1}
 .card h3 button{
   all:unset;cursor:pointer;display:block;
@@ -287,7 +288,7 @@ footer{
 }
 
 @media (max-width: 900px){
-  .creature{--creature-y:72%;width:min(1400px,150vw)}
+  .creature{--creature-y:82%;width:min(1400px,150vw)}
   nav.desk a{min-width:150px;font-size:14px}
   .c-wide,.c-side,.c-half{grid-column:span 12}   /* single column from here down */
   .frame{max-width:none}
@@ -296,7 +297,7 @@ footer{
   nav.desk{display:none}
   .burger{display:flex}
   .topbar{align-items:center;padding-block:16px 12px}
-  .creature{width:min(1000px,185vw);--creature-y:70%}
+  .creature{width:min(1000px,185vw);--creature-y:80%}
   .hero{padding-block:30px 34px}
   .frame{padding:22px 20px 24px}
 }
@@ -308,8 +309,16 @@ html{scroll-behavior:smooth}
 
 <div class="slide" id="top">
 
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="boil" x="-14%" y="-14%" width="128%" height="128%" color-interpolation-filters="sRGB">
+      <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.008" numOctaves="1" seed="7" result="n"/>
+      <feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+
   <div class="creature" id="creature">
     <video id="vid" muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <video id="viddown" muted playsinline preload="auto" aria-hidden="true" hidden></video>
     <div class="eye" id="eye"><i id="pupil"></i></div>
   </div>
   <div class="rule" aria-hidden="true"></div>
@@ -377,9 +386,11 @@ html{scroll-behavior:smooth}
 
       <div class="item c-side">
         <div class="card beige">
+          <video class="thumb" src="media/mm_coming_soon.mp4" autoplay muted loop playsinline
+                 preload="metadata" width="1080" height="1920" aria-label="Metamorphosis teaser"></video>
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-metamorphosis">Metamorphosis</button></h3>
-            <p>A motion piece on change as something you go through rather than something you finish. Coming soon.</p>
+            <p>Cut, chop, glue, sew, grow, grow, grow &hellip; pop. Take flight.</p>
             <div class="foot">
               <span class="tag">Motion · 2026</span>
               <span class="chev" aria-hidden="true">&#9660;</span>
@@ -387,8 +398,7 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-metamorphosis"><div><div class="inner">
-          <video class="clip" src="media/mm_coming_soon.mp4" muted loop playsinline
-                 preload="none" width="1080" height="1920" aria-label="Metamorphosis teaser"></video>
+          <p class="note">In progress. The full piece lands here when it is cut.</p>
         </div></div></div>
       </div>
 
@@ -520,10 +530,33 @@ html{scroll-behavior:smooth}
 <script>
 (function(){
   // ---- where the assets live once this is deployed ----
-  const VIDEO_SRC = 'media/anim_idle_v1.mp4';
-  const TRACK_SRC = 'media/anim_idle_v1.json';
   const MARK_SRC  = 'images/header_MattyWordmark_V1.svg';
-  const FPS       = 24;
+
+  // Each clip carries its own track and frame rate, so the eye stays locked
+  // to the head whichever one is playing.
+  const CLIPS = {
+    idle: {
+      src:'media/anim_idle_v1.mp4', track:'media/anim_idle_v1.json',
+      fps:24, loop:true, startAt:0
+    },
+    down: {
+      src:'media/anim_scroll_down_v1.mp4', track:'media/anim_scroll_down_v1.json',
+      // the first 24 frames hold on the idle pose; skipping them makes the
+      // descent answer the scroll straight away
+      fps:24, loop:false, startAt:1.0
+    }
+  };
+
+  // boil values carried over from the previs rig
+  const BOIL = {peak:21, len:550, rate:13, freq:0.008, oct:1};
+
+  // how far down the page the descent fires, as a fraction of viewport height.
+  // Two thresholds so a scroll that hovers on the line doesn't flap.
+  const TRIP_DOWN = 0.12, TRIP_UP = 0.04;
+
+  const VIDEO_SRC = CLIPS.idle.src;
+  const TRACK_SRC = CLIPS.idle.track;
+  const FPS       = CLIPS.idle.fps;
 
   // ---- inline the wordmark so its colour comes from CSS ----
   // Leaves the <img> in place if this fails (file:// or a 404), so it
@@ -552,13 +585,15 @@ html{scroll-behavior:smooth}
       .catch(() => {});
   })();
 
-  const vid = document.getElementById('vid');
+  const vid  = document.getElementById('vid');
+  const vidD = document.getElementById('viddown');
   const eye = document.getElementById('eye');
   const pup = document.getElementById('pupil');
   const box = document.getElementById('creature');
   const loader = document.getElementById('loader');
 
   let track = null, haveVideo = false;
+  let trackD = null, state = 'idle';   // idle | down
   let px = 0, py = 0, cx = 0.5, cy = 0.5, pointerSeen = false;
   let glance = {x:0, y:0}, glanceAt = 0;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -692,6 +727,68 @@ html{scroll-behavior:smooth}
   })();
   attachVideo(VIDEO_SRC);
   fetch(TRACK_SRC).then(r => r.ok ? r.json() : Promise.reject()).then(setTrack).catch(ready);
+
+  // ---- descent clip, loaded quietly alongside ----
+  vidD.src = CLIPS.down.src;
+  vidD.load();
+  fetch(CLIPS.down.track)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(raw => { trackD = raw.map(p => ({x:+p[0], y:+p[1]})); })
+    .catch(() => {});
+
+  // ---- boil transition between the two clips ----
+  const turb = document.getElementById('turb');
+  const disp = document.getElementById('disp');
+  let boilAt = 0, boilSwapped = false, boilTo = null, lastSeed = 0, filterOn = false;
+  const smoothK = k => k * k * (3 - 2 * k);
+
+  function startBoil(to){
+    if(boilAt || to === state || !trackD || !haveVideo || reduce) return;
+    boilTo = to; boilSwapped = false; boilAt = performance.now();
+  }
+
+  function doSwap(to){
+    if(to === 'down'){
+      vid.pause();
+      vid.hidden = true;
+      vidD.hidden = false;
+      vidD.currentTime = CLIPS.down.startAt;
+      vidD.play().catch(() => {});
+    } else {
+      vidD.pause();
+      vidD.hidden = true;
+      vid.hidden = false;
+      vid.currentTime = 0;          // descent frame 0 and idle frame 0 share a pose
+      vid.playbackRate = 1;         // breath may have left it slow
+      vid.play().catch(() => {});
+    }
+    state = to;
+  }
+
+  function boilTick(now){
+    if(now - lastSeed > 1000 / BOIL.rate){
+      turb.setAttribute('seed', (Math.random() * 9999) | 0);
+      lastSeed = now;
+    }
+    let scale = 0;
+    if(boilAt){
+      const k = Math.min(1, (now - boilAt) / BOIL.len);
+      const tri = k < 0.5 ? k * 2 : (1 - k) * 2;
+      scale = smoothK(tri) * BOIL.peak;
+      if(k >= 0.5 && !boilSwapped){ boilSwapped = true; doSwap(boilTo); }
+      if(k >= 1){ boilAt = 0; boilTo = null; }
+    }
+    disp.setAttribute('scale', scale.toFixed(2));
+    const want = scale > 0.05;
+    if(want !== filterOn){ box.style.filter = want ? 'url(#boil)' : ''; filterOn = want; }
+  }
+
+  // ---- scroll decides which clip is live ----
+  addEventListener('scroll', () => {
+    const y = scrollY / innerHeight;
+    if(state === 'idle' && y > TRIP_DOWN) startBoil('down');
+    else if(state === 'down' && y < TRIP_UP) startBoil('idle');
+  }, {passive:true});
   setTimeout(() => { if(!(track && haveVideo)) loader.hidden = false; }, 900);
 
   // ---- preview loading ----
@@ -723,10 +820,20 @@ html{scroll-behavior:smooth}
   }, {passive:true});
 
   // ---- the loop ----
-  function tick(){
-    if(track && track.length && haveVideo){
-      const i = ((Math.floor(vid.currentTime * FPS) % track.length) + track.length) % track.length;
-      const p = track[i];
+  function tick(now){
+    boilTick(now || performance.now());
+
+    const live = state === 'down' ? trackD : track;
+    const lv   = state === 'down' ? vidD : vid;
+    const lfps = state === 'down' ? CLIPS.down.fps : CLIPS.idle.fps;
+
+    if(live && live.length && haveVideo){
+      // the descent runs once and holds, so clamp rather than wrap
+      let i = Math.floor(lv.currentTime * lfps);
+      i = state === 'down'
+        ? Math.max(0, Math.min(live.length - 1, i))
+        : ((i % live.length) + live.length) % live.length;
+      const p = live[i];
       eye.style.left = (p.x * 100) + '%';
       eye.style.top  = (p.y * 100) + '%';
 
