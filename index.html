@@ -391,7 +391,7 @@ html{scroll-behavior:smooth}
 
       <div class="item c-side">
         <div class="card beige">
-          <video class="thumb" src="media/mm_coming_soon.mp4" autoplay muted loop playsinline
+          <video class="thumb" src="images/work/mm_coming_soon.mp4" autoplay muted loop playsinline
                  preload="metadata" width="1080" height="1920" aria-label="Metamorphosis teaser"></video>
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-metamorphosis">Metamorphosis</button></h3>
@@ -444,7 +444,7 @@ html{scroll-behavior:smooth}
 
       <div class="item c-half">
         <div class="card dark">
-          <img class="thumb" src="images/work/thumb-varsity-vr.jpg" alt="Switchgear asset rendered on black" loading="lazy" width="880" height="495">
+          <img class="thumb" src="images/work/thumb-varsity-vr-01.jpg" alt="Switchgear asset rendered on black" loading="lazy" width="880" height="495">
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-varsity">Varsity VR Training</button></h3>
             <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
@@ -510,9 +510,9 @@ html{scroll-behavior:smooth}
     <p class="eyebrow">Get in touch</p>
     <h2>Contact</h2>
     <div class="contact">
-      <a href="#">Email</a>
-      <a href="#">LinkedIn</a>
-      <a href="#">Process journal</a>
+      <a href="mailto:mjbissell@gmail.com">mjbissell@gmail.com</a>
+      <a href="#LINKEDIN_URL">LinkedIn</a>
+      <a href="#JOURNAL_URL">Process journal</a>
     </div>
   </section>
 
@@ -748,7 +748,9 @@ html{scroll-behavior:smooth}
   const smoothK = k => k * k * (3 - 2 * k);
 
   function startBoil(to){
-    if(boilAt || to === state || !trackD || !haveVideo || reduce) return;
+    if(boilAt || to === state || !trackD || !haveVideo) return;
+    // reduced motion loses the agitation, not the clip change
+    if(reduce){ doSwap(to); return; }
     boilTo = to; boilSwapped = false; boilAt = performance.now();
   }
 
