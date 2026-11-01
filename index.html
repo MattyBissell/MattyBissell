@@ -121,6 +121,7 @@ body[data-navopen="true"]{overflow:hidden}
 /* framed hero block */
 .frame{
   border:var(--stroke) solid var(--cream);
+  background:var(--frame-bg, rgba(0,0,0,.35));
   padding:30px 34px 34px;
   max-width:760px;
   will-change:transform;
@@ -179,12 +180,51 @@ h2{
 }
 .card.beige{background:var(--beige)}
 .card.dark{background:#17171c;color:var(--cream);border:1px solid var(--line)}
-.card h3{margin:0;font-size:19px;font-weight:600;line-height:1.25}
+.card h3{margin:0;font-size:19px;font-weight:600;line-height:1.25;padding-right:26px}
+/* cards that leave the site get the same arrow the slides use */
+.card.ext{position:relative}
+.card.ext::after{
+  content:"\2197";position:absolute;top:17px;right:18px;
+  font-size:15px;line-height:1;opacity:.45;
+  transition:opacity .15s ease,transform .15s ease;
+}
+.card.ext:hover::after,.card.ext:focus-visible::after{
+  opacity:1;transform:translate(2px,-2px);
+}
 .card p{margin:0;font-size:14px;line-height:1.5;opacity:.82}
 .card .tag{
   font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
   font-weight:600;opacity:.6;margin-top:auto;padding-top:14px;
 }
+/* ---------- expanding cards ---------- */
+.item{min-width:0;display:flex;flex-direction:column}
+.item > .card{width:100%;box-sizing:border-box;text-align:left;border:0;font:inherit;cursor:pointer}
+.card .chev{
+  position:absolute;top:17px;right:18px;font-size:13px;line-height:1;opacity:.45;
+  transition:transform .25s ease,opacity .15s ease;
+}
+.card[aria-expanded="true"] .chev{transform:rotate(180deg);opacity:1}
+
+.panel{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .36s cubic-bezier(.4,0,.2,1);
+}
+.panel > div{overflow:hidden;min-height:0}
+.item[data-open="true"] .panel{grid-template-rows:1fr}
+.panel .inner{padding:14px 0 4px;display:flex;flex-direction:column;gap:12px}
+.panel img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--line);background:#0d0d0d;
+}
+.panel .out{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--leaf);color:var(--leaf);text-decoration:none;
+  font-size:12.5px;letter-spacing:.06em;padding:8px 14px;
+  transition:background .15s,color .15s;
+}
+.panel .out:hover{background:var(--leaf);color:#0b0b0d}
+.panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+
 .c-wide{grid-column:span 7}
 .c-side{grid-column:span 5}
 .c-half{grid-column:span 6}
@@ -295,36 +335,96 @@ html{scroll-behavior:smooth}
     <p class="eyebrow">Selected work</p>
     <h2>Interactions</h2>
     <div class="grid">
-      <a class="card c-wide" href="#">
-        <h3>Fiddlearm</h3>
-        <p>A presence-responsive creature-weed on a gallery monitor. MediaPipe pose data runs through TouchDesigner into Unreal Engine 5, so the plant answers to where you stand and how you move. There is no correct input. It opens for people who stay with it.</p>
-        <span class="tag">DES309 capstone · TouchDesigner · UE5</span>
-      </a>
-      <a class="card beige c-side" href="#">
-        <h3>Hello Stranger</h3>
-        <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
-        <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
-      </a>
-      <a class="card dark c-half" href="#">
-        <h3>Varsity VR Training</h3>
-        <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
-        <span class="tag">Maya · Substance · Unity · 25,780 tris</span>
-      </a>
-      <a class="card c-half" href="#">
-        <h3>Keeper</h3>
-        <p>A lighthouse diorama with character and vehicle studies alongside it. Self-directed, full pipeline from block-out through to 2K PBR across three UDIM tiles.</p>
-        <span class="tag">Case study · 2024 · 39,257 tris</span>
-      </a>
-      <a class="card beige c-side" href="#">
-        <h3>The Moving Feast</h3>
-        <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
-        <span class="tag">Brand identity · Industrial concept</span>
-      </a>
-      <a class="card dark c-wide" href="#">
-        <h3>Whitsunday In Motion</h3>
-        <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
-        <span class="tag">BCI304 · Team project</span>
-      </a>
+
+      <div class="item c-wide">
+        <button class="card" type="button" aria-expanded="false" aria-controls="p-fiddlearm">
+          <h3>Fiddlearm</h3>
+          <p>A presence-responsive creature-weed on a gallery monitor. MediaPipe pose data runs through TouchDesigner into Unreal Engine 5, so the plant answers to where you stand and how you move. There is no correct input. It opens for people who stay with it.</p>
+          <span class="tag">DES309 capstone · TouchDesigner · UE5</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-fiddlearm"><div><div class="inner">
+          <p class="note">The creature at the top of this page is the piece, rebuilt for the web from the same Blender rig. The installation ran on a 55-inch monitor in a shared gallery room, driven live by pose tracking.</p>
+          <a class="out" href="#JOURNAL_URL" target="_blank" rel="noopener">Process journal <span aria-hidden="true">&#8599;</span></a>
+        </div></div></div>
+      </div>
+
+      <!-- Pull this card until the motion graphic exists. An empty slot
+           reads worse to a visitor than one fewer project. -->
+      <div class="item c-side">
+        <button class="card beige" type="button" aria-expanded="false" aria-controls="p-metamorphosis">
+          <h3>Metamorphosis</h3>
+          <p>Motion graphic. In progress.</p>
+          <span class="tag">Motion · 2026</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-metamorphosis"><div><div class="inner">
+          <p class="note">Placeholder. Drop the render into <code>images/work/</code> or embed the video here.</p>
+        </div></div></div>
+      </div>
+
+      <div class="item c-half">
+        <button class="card" type="button" aria-expanded="false" aria-controls="p-stranger">
+          <h3>Hello Stranger</h3>
+          <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
+          <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-stranger"><div><div class="inner">
+          <img src="images/work/hello-stranger-01.jpg" alt="Hello Stranger installation and in-engine views" loading="lazy" width="1600" height="900">
+        </div></div></div>
+      </div>
+
+      <div class="item c-half">
+        <button class="card beige" type="button" aria-expanded="false" aria-controls="p-feast">
+          <h3>The Moving Feast</h3>
+          <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
+          <span class="tag">Brand identity · Industrial concept</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-feast"><div><div class="inner">
+          <img src="images/work/moving-feast-01.jpg" alt="The Moving Feast cart, front and rear views, with signage" loading="lazy" width="1600" height="900">
+          <img src="images/work/moving-feast-02.jpg" alt="The Moving Feast logo mark and signage in situ" loading="lazy" width="1600" height="900">
+        </div></div></div>
+      </div>
+
+      <div class="item c-half">
+        <button class="card dark" type="button" aria-expanded="false" aria-controls="p-varsity">
+          <h3>Varsity VR Training</h3>
+          <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
+          <span class="tag">Maya · Substance · Unity · 25,780 tris</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-varsity"><div><div class="inner">
+          <img src="images/work/varsity-vr-01.jpg" alt="Varsity VR Training asset and module interface" loading="lazy" width="1600" height="900">
+        </div></div></div>
+      </div>
+
+      <div class="item c-half">
+        <button class="card" type="button" aria-expanded="false" aria-controls="p-keeper">
+          <h3>Keeper</h3>
+          <p>A lighthouse diorama with character and vehicle studies alongside it. Self-directed, full pipeline from block-out through to 2K PBR across three UDIM tiles.</p>
+          <span class="tag">Case study · 2024 · 39,257 tris</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-keeper"><div><div class="inner">
+          <img src="images/work/keeper-01.jpg" alt="Keeper lighthouse diorama, character and tractor models" loading="lazy" width="1600" height="900">
+          <a class="out" href="#SKETCHFAB_URL" target="_blank" rel="noopener">Sketchfab view <span aria-hidden="true">&#8599;</span></a>
+        </div></div></div>
+      </div>
+
+      <div class="item c-full">
+        <button class="card dark" type="button" aria-expanded="false" aria-controls="p-whitsunday">
+          <h3>Whitsunday In Motion</h3>
+          <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
+          <span class="tag">BCI304 · Team project · Video</span>
+          <span class="chev" aria-hidden="true">&#9660;</span>
+        </button>
+        <div class="panel" id="p-whitsunday"><div><div class="inner">
+          <a class="out" href="https://www.youtube.com/watch?v=tr_FrpLwcBU" target="_blank" rel="noopener">Watch the video <span aria-hidden="true">&#8599;</span></a>
+        </div></div></div>
+      </div>
+
     </div>
   </section>
 
@@ -332,8 +432,9 @@ html{scroll-behavior:smooth}
     <p class="eyebrow">About</p>
     <h2>Me</h2>
     <div class="prose">
-      <p>I build things people interact with. Nine years at THQ as a Senior Artist across eight shipped games, then immersive training products at Bondi Labs and Powercor, and now a Bachelor of Design at UniSC majoring in Interactive Media.</p>
-      <p>The work tends toward systems that reward attention rather than rewarding input. Placeholder paragraph — replace with your own.</p>
+      <p>I'm a dad who ended up in tech by way of a lot of other jobs. Nine years at THQ as a Senior Artist across eight shipped games, then immersive training products at Bondi Labs and Powercor, and now a Bachelor of Design at UniSC majoring in Interactive Media.</p>
+      <p>Somewhere in all that I got more interested in why a thing gets built than in what it turns out to be. The work I want to do now puts something human back into non-places: the supermarket, the airport, the rooms people move through without ever being asked anything. Technology is only worth much here if it becomes culture people actually share.</p>
+      <p>Creative collaboration is the part I'm chasing. I'd rather make something with people than for them.</p>
     </div>
   </section>
 
@@ -685,6 +786,21 @@ html{scroll-behavior:smooth}
   burger.addEventListener('click', () => setNav(mob.dataset.open !== 'true'));
   mob.addEventListener('click', e => { if(e.target.tagName === 'A') setNav(false); });
   addEventListener('keydown', e => { if(e.key === 'Escape') setNav(false); });
+
+  // ---- expanding work cards ----
+  document.querySelectorAll('.item > .card').forEach(b => {
+    b.addEventListener('click', () => {
+      const item = b.parentElement;
+      const open = item.dataset.open === 'true';
+      // one at a time, so the grid never turns into a wall
+      document.querySelectorAll('.item[data-open="true"]').forEach(o => {
+        o.dataset.open = 'false';
+        o.querySelector('.card').setAttribute('aria-expanded', 'false');
+      });
+      item.dataset.open = String(!open);
+      b.setAttribute('aria-expanded', String(!open));
+    });
+  });
 
   // ---- parallax, first slide only ----
   const head = document.querySelector('header');
