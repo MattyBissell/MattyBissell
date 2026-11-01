@@ -108,7 +108,7 @@ body[data-navopen="true"]{overflow:hidden}
 /* ---------- creature ---------- */
 .creature{
   position:absolute;pointer-events:none;z-index:0;
-  left:50%;top:var(--creature-y, 54%);
+  left:50%;top:var(--creature-y, 74%);
   transform:translate(-50%, calc(-50% + var(--py, 0px)));
   width:min(2400px,156vw);aspect-ratio:16/9;
   will-change:transform;
@@ -242,6 +242,10 @@ h2{
 }
 .panel .out:hover{background:var(--leaf);color:#0b0b0d}
 .panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.panel .clip{
+  display:block;width:100%;max-width:380px;height:auto;
+  border:1px solid var(--line);background:#0d0d0d;
+}
 
 .c-wide{grid-column:span 7}
 .c-side{grid-column:span 5}
@@ -283,7 +287,7 @@ footer{
 }
 
 @media (max-width: 900px){
-  .creature{--creature-y:52%;width:min(1400px,150vw)}
+  .creature{--creature-y:72%;width:min(1400px,150vw)}
   nav.desk a{min-width:150px;font-size:14px}
   .c-wide,.c-side,.c-half{grid-column:span 12}   /* single column from here down */
   .frame{max-width:none}
@@ -292,7 +296,7 @@ footer{
   nav.desk{display:none}
   .burger{display:flex}
   .topbar{align-items:center;padding-block:16px 12px}
-  .creature{width:min(1000px,185vw);--creature-y:50%}
+  .creature{width:min(1000px,185vw);--creature-y:70%}
   .hero{padding-block:30px 34px}
   .frame{padding:22px 20px 24px}
 }
@@ -371,13 +375,11 @@ html{scroll-behavior:smooth}
         </div></div></div>
       </div>
 
-      <!-- Pull this card until the motion graphic exists. An empty slot
-           reads worse to a visitor than one fewer project. -->
       <div class="item c-side">
         <div class="card beige">
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-metamorphosis">Metamorphosis</button></h3>
-            <p>Motion graphic. In progress.</p>
+            <p>A motion piece on change as something you go through rather than something you finish. Coming soon.</p>
             <div class="foot">
               <span class="tag">Motion · 2026</span>
               <span class="chev" aria-hidden="true">&#9660;</span>
@@ -385,7 +387,8 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-metamorphosis"><div><div class="inner">
-          <p class="note">Placeholder. Drop the render into <code>images/work/</code> or embed the video here.</p>
+          <video class="clip" src="media/mm_coming_soon.mp4" muted loop playsinline
+                 preload="none" width="1080" height="1920" aria-label="Metamorphosis teaser"></video>
         </div></div></div>
       </div>
 
@@ -849,6 +852,12 @@ html{scroll-behavior:smooth}
       });
       item.dataset.open = String(!open);
       b.setAttribute('aria-expanded', String(!open));
+      // only the open panel's clip runs
+      document.querySelectorAll('.panel video').forEach(v => { v.pause(); });
+      if(!open){
+        const v = item.querySelector('.panel video');
+        if(v) v.play().catch(() => {});
+      }
     });
   });
 
