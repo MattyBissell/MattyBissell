@@ -34,9 +34,13 @@ a{color:inherit}
 /* ---------- header ---------- */
 /* first slide: header, creature and intro share one full-height screen */
 .slide{
-  position:relative;min-height:100svh;overflow:hidden;
+  position:relative;min-height:100svh;
+  /* clip sideways only. `hidden` would force the other axis to scroll and
+     cut the descending arm off at the fold; `clip` leaves it visible. */
+  overflow-x:clip;overflow-y:visible;
   display:flex;flex-direction:column;padding-bottom:64px;
 }
+html{overflow-x:clip}
 header{position:relative;z-index:2}
 .topbar{
   display:flex;align-items:flex-start;gap:20px;
