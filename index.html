@@ -198,12 +198,30 @@ h2{
 }
 /* ---------- expanding cards ---------- */
 .item{min-width:0;display:flex;flex-direction:column}
-.item > .card{width:100%;box-sizing:border-box;text-align:left;border:0;font:inherit;cursor:pointer}
+/* an open card takes the whole row, so the slide gets real size */
+.item[data-open="true"]{grid-column:1 / -1}
+
+.card{position:relative;padding:0;gap:0}
+.card .thumb{
+  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
+  background:#0d0d0d;
+}
+.card .body{display:flex;flex-direction:column;gap:8px;padding:18px 20px 16px;flex:1}
+.card h3 button{
+  all:unset;cursor:pointer;display:block;
+}
+.card h3 button::after{content:"";position:absolute;inset:0}   /* whole card is the target */
+.card h3 button:focus-visible{outline:2px solid var(--leaf);outline-offset:3px}
+.card .foot{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+  margin-top:auto;padding-top:14px;
+}
+.card .foot .tag{margin:0;padding:0}
 .card .chev{
-  position:absolute;top:17px;right:18px;font-size:13px;line-height:1;opacity:.45;
+  flex:0 0 auto;font-size:11px;line-height:1;opacity:.5;
   transition:transform .25s ease,opacity .15s ease;
 }
-.card[aria-expanded="true"] .chev{transform:rotate(180deg);opacity:1}
+.item[data-open="true"] .chev{transform:rotate(180deg);opacity:1}
 
 .panel{
   display:grid;grid-template-rows:0fr;
@@ -337,12 +355,16 @@ html{scroll-behavior:smooth}
     <div class="grid">
 
       <div class="item c-wide">
-        <button class="card" type="button" aria-expanded="false" aria-controls="p-fiddlearm">
-          <h3>Fiddlearm</h3>
-          <p>A presence-responsive creature-weed on a gallery monitor. MediaPipe pose data runs through TouchDesigner into Unreal Engine 5, so the plant answers to where you stand and how you move. There is no correct input. It opens for people who stay with it.</p>
-          <span class="tag">DES309 capstone · TouchDesigner · UE5</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-fiddlearm">Fiddlearm</button></h3>
+            <p>A presence-responsive creature-weed on a gallery monitor. MediaPipe pose data runs through TouchDesigner into Unreal Engine 5, so the plant answers to where you stand and how you move. There is no correct input. It opens for people who stay with it.</p>
+            <div class="foot">
+              <span class="tag">DES309 capstone · TouchDesigner · UE5</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-fiddlearm"><div><div class="inner">
           <p class="note">The creature at the top of this page is the piece, rebuilt for the web from the same Blender rig. The installation ran on a 55-inch monitor in a shared gallery room, driven live by pose tracking.</p>
           <a class="out" href="#JOURNAL_URL" target="_blank" rel="noopener">Process journal <span aria-hidden="true">&#8599;</span></a>
@@ -352,36 +374,50 @@ html{scroll-behavior:smooth}
       <!-- Pull this card until the motion graphic exists. An empty slot
            reads worse to a visitor than one fewer project. -->
       <div class="item c-side">
-        <button class="card beige" type="button" aria-expanded="false" aria-controls="p-metamorphosis">
-          <h3>Metamorphosis</h3>
-          <p>Motion graphic. In progress.</p>
-          <span class="tag">Motion · 2026</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card beige">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-metamorphosis">Metamorphosis</button></h3>
+            <p>Motion graphic. In progress.</p>
+            <div class="foot">
+              <span class="tag">Motion · 2026</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-metamorphosis"><div><div class="inner">
           <p class="note">Placeholder. Drop the render into <code>images/work/</code> or embed the video here.</p>
         </div></div></div>
       </div>
 
       <div class="item c-half">
-        <button class="card" type="button" aria-expanded="false" aria-controls="p-stranger">
-          <h3>Hello Stranger</h3>
-          <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
-          <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card">
+          <img class="thumb" src="images/work/thumb-hello-stranger.jpg" alt="Visitor in front of the Hello Stranger projection" loading="lazy" width="880" height="495">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-stranger">Hello Stranger</button></h3>
+            <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
+            <div class="foot">
+              <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-stranger"><div><div class="inner">
           <img src="images/work/hello-stranger-01.jpg" alt="Hello Stranger installation and in-engine views" loading="lazy" width="1600" height="900">
         </div></div></div>
       </div>
 
       <div class="item c-half">
-        <button class="card beige" type="button" aria-expanded="false" aria-controls="p-feast">
-          <h3>The Moving Feast</h3>
-          <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
-          <span class="tag">Brand identity · Industrial concept</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card beige">
+          <img class="thumb" src="images/work/thumb-moving-feast.jpg" alt="The Moving Feast cart and pointing sign" loading="lazy" width="880" height="495">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-feast">The Moving Feast</button></h3>
+            <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
+            <div class="foot">
+              <span class="tag">Brand identity · Industrial concept</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-feast"><div><div class="inner">
           <img src="images/work/moving-feast-01.jpg" alt="The Moving Feast cart, front and rear views, with signage" loading="lazy" width="1600" height="900">
           <img src="images/work/moving-feast-02.jpg" alt="The Moving Feast logo mark and signage in situ" loading="lazy" width="1600" height="900">
@@ -389,24 +425,34 @@ html{scroll-behavior:smooth}
       </div>
 
       <div class="item c-half">
-        <button class="card dark" type="button" aria-expanded="false" aria-controls="p-varsity">
-          <h3>Varsity VR Training</h3>
-          <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
-          <span class="tag">Maya · Substance · Unity · 25,780 tris</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card dark">
+          <img class="thumb" src="images/work/thumb-varsity-vr.jpg" alt="Switchgear asset rendered on black" loading="lazy" width="880" height="495">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-varsity">Varsity VR Training</button></h3>
+            <p>Technical training modules for electrical distribution work. Switchgear, test equipment and field environments authored and optimised for real-time VR delivery across seven module packs.</p>
+            <div class="foot">
+              <span class="tag">Maya · Substance · Unity · 25,780 tris</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-varsity"><div><div class="inner">
           <img src="images/work/varsity-vr-01.jpg" alt="Varsity VR Training asset and module interface" loading="lazy" width="1600" height="900">
         </div></div></div>
       </div>
 
       <div class="item c-half">
-        <button class="card" type="button" aria-expanded="false" aria-controls="p-keeper">
-          <h3>Keeper</h3>
-          <p>A lighthouse diorama with character and vehicle studies alongside it. Self-directed, full pipeline from block-out through to 2K PBR across three UDIM tiles.</p>
-          <span class="tag">Case study · 2024 · 39,257 tris</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card">
+          <img class="thumb" src="images/work/thumb-keeper.jpg" alt="Lighthouse lamp room and tower" loading="lazy" width="880" height="495">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-keeper">Keeper</button></h3>
+            <p>A lighthouse diorama with character and vehicle studies alongside it. Self-directed, full pipeline from block-out through to 2K PBR across three UDIM tiles.</p>
+            <div class="foot">
+              <span class="tag">Case study · 2024 · 39,257 tris</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-keeper"><div><div class="inner">
           <img src="images/work/keeper-01.jpg" alt="Keeper lighthouse diorama, character and tractor models" loading="lazy" width="1600" height="900">
           <a class="out" href="#SKETCHFAB_URL" target="_blank" rel="noopener">Sketchfab view <span aria-hidden="true">&#8599;</span></a>
@@ -414,12 +460,16 @@ html{scroll-behavior:smooth}
       </div>
 
       <div class="item c-full">
-        <button class="card dark" type="button" aria-expanded="false" aria-controls="p-whitsunday">
-          <h3>Whitsunday In Motion</h3>
-          <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
-          <span class="tag">BCI304 · Team project · Video</span>
-          <span class="chev" aria-hidden="true">&#9660;</span>
-        </button>
+        <div class="card dark">
+          <div class="body">
+            <h3><button type="button" aria-expanded="false" aria-controls="p-whitsunday">Whitsunday In Motion</button></h3>
+            <p>Motion-activated display and virtual airport built with a team for Whitsunday Coast Airport.</p>
+            <div class="foot">
+              <span class="tag">BCI304 · Team project · Video</span>
+              <span class="chev" aria-hidden="true">&#9660;</span>
+            </div>
+          </div>
+        </div>
         <div class="panel" id="p-whitsunday"><div><div class="inner">
           <a class="out" href="https://www.youtube.com/watch?v=tr_FrpLwcBU" target="_blank" rel="noopener">Watch the video <span aria-hidden="true">&#8599;</span></a>
         </div></div></div>
@@ -788,14 +838,14 @@ html{scroll-behavior:smooth}
   addEventListener('keydown', e => { if(e.key === 'Escape') setNav(false); });
 
   // ---- expanding work cards ----
-  document.querySelectorAll('.item > .card').forEach(b => {
+  document.querySelectorAll('.item .card h3 button').forEach(b => {
     b.addEventListener('click', () => {
-      const item = b.parentElement;
+      const item = b.closest('.item');
       const open = item.dataset.open === 'true';
       // one at a time, so the grid never turns into a wall
       document.querySelectorAll('.item[data-open="true"]').forEach(o => {
         o.dataset.open = 'false';
-        o.querySelector('.card').setAttribute('aria-expanded', 'false');
+        o.querySelector('.card h3 button').setAttribute('aria-expanded', 'false');
       });
       item.dataset.open = String(!open);
       b.setAttribute('aria-expanded', String(!open));
