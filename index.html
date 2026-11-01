@@ -41,6 +41,8 @@ a{color:inherit}
   display:flex;flex-direction:column;padding-bottom:64px;
 }
 html{overflow-x:clip}
+/* page content sits above the creature and the drifting rule */
+main.shell{position:relative;z-index:1}
 header{position:relative;z-index:2}
 .topbar{
   display:flex;align-items:flex-start;gap:20px;
@@ -119,7 +121,7 @@ body[data-navopen="true"]{overflow:hidden}
   will-change:transform;
 }
 .rule{
-  position:absolute;z-index:1;left:0;right:0;top:64%;
+  position:absolute;z-index:0;left:0;right:0;top:64%;
   border-top:1px dashed #33333d;pointer-events:none;will-change:transform;
 }
 
@@ -416,7 +418,7 @@ html{scroll-behavior:smooth}
           <img class="thumb" src="images/work/thumb-hello-stranger.jpg" alt="Visitor in front of the Hello Stranger projection" loading="lazy" width="880" height="495">
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-stranger">Hello Stranger</button></h3>
-            <p>A scanned supermarket rebuilt as a four-wall room that comes apart and back together according to where you are in it. The piece Fiddlearm grew out of.</p>
+            <p>A real-time piece that puts you inside a supermarket where the sound and the space turn hostile under a freeze response. Social anxiety in a non-place, and the work Fiddlearm grew out of.</p>
             <div class="foot">
               <span class="tag">TouchDesigner · MediaPipe · Unreal</span>
               <span class="chev" aria-hidden="true">&#9660;</span>
@@ -433,7 +435,7 @@ html{scroll-behavior:smooth}
           <img class="thumb" src="images/work/thumb-moving-feast.jpg" alt="The Moving Feast cart and pointing sign" loading="lazy" width="880" height="495">
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-feast">The Moving Feast</button></h3>
-            <p>Identity and cart design for a mobile food service. Mark, wayfinding and signage, carried through to a built-form concept visualised in full.</p>
+            <p>A rebrand for the tucked-away community garden at Sippy Downs, reimagined as a mobile food service. One design system carried from the mark and signage through to 3D prototypes.</p>
             <div class="foot">
               <span class="tag">Brand identity · Industrial concept</span>
               <span class="chev" aria-hidden="true">&#9660;</span>
@@ -515,7 +517,7 @@ html{scroll-behavior:smooth}
     <h2>Contact</h2>
     <div class="contact">
       <a href="mailto:mjbissell@gmail.com">mjbissell@gmail.com</a>
-      <a href="#LINKEDIN_URL">LinkedIn</a>
+      <a href="https://www.linkedin.com/in/matthew-bissell-9010507/" target="_blank" rel="noopener">LinkedIn</a>
       <a href="#JOURNAL_URL">Process journal</a>
     </div>
   </section>
@@ -552,7 +554,9 @@ html{scroll-behavior:smooth}
       src:'media/anim_scroll_down_v1.mp4', track:'media/anim_scroll_down_v1.json',
       // the first 24 frames hold on the idle pose; skipping them makes the
       // descent answer the scroll straight away
-      fps:24, loop:false, startAt:1.0
+      fps:24, loop:false, startAt:1.0,
+      holdFor:0.3,      // pause this far in
+      resumeAt:0.34     // and resume once the scroll passes this much of a screen
     }
   };
 
@@ -749,6 +753,7 @@ html{scroll-behavior:smooth}
   const turb = document.getElementById('turb');
   const disp = document.getElementById('disp');
   let boilAt = 0, boilSwapped = false, boilTo = null, lastSeed = 0, filterOn = false;
+  let holding = false;
   const smoothK = k => k * k * (3 - 2 * k);
 
   function startBoil(to){
@@ -764,6 +769,7 @@ html{scroll-behavior:smooth}
       vid.hidden = true;
       vidD.hidden = false;
       vidD.currentTime = CLIPS.down.startAt;
+      holding = true;                 // released when the scroll carries on
       vidD.play().catch(() => {});
     } else {
       vidD.pause();
@@ -771,6 +777,7 @@ html{scroll-behavior:smooth}
       vid.hidden = false;
       vid.currentTime = 0;          // descent frame 0 and idle frame 0 share a pose
       vid.playbackRate = 1;         // breath may have left it slow
+      holding = false;
       vid.play().catch(() => {});
     }
     state = to;
@@ -789,6 +796,11 @@ html{scroll-behavior:smooth}
       if(k >= 0.5 && !boilSwapped){ boilSwapped = true; doSwap(boilTo); }
       if(k >= 1){ boilAt = 0; boilTo = null; }
     }
+    if(holding && state === 'down' &&
+       vidD.currentTime >= CLIPS.down.startAt + CLIPS.down.holdFor){
+      vidD.pause();
+    }
+
     disp.setAttribute('scale', scale.toFixed(2));
     const want = scale > 0.05;
     if(want !== filterOn){ box.style.filter = want ? 'url(#boil)' : ''; filterOn = want; }
@@ -799,6 +811,10 @@ html{scroll-behavior:smooth}
     const y = scrollY / innerHeight;
     if(state === 'idle' && y > TRIP_DOWN) startBoil('down');
     else if(state === 'down' && y < TRIP_UP) startBoil('idle');
+    else if(state === 'down' && holding && y > CLIPS.down.resumeAt){
+      holding = false;
+      vidD.play().catch(() => {});
+    }
   }, {passive:true});
   setTimeout(() => { if(!(track && haveVideo)) loader.hidden = false; }, 900);
 
