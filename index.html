@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Matty Bissell</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
@@ -128,9 +129,12 @@ body[data-navopen="true"]{overflow:hidden}
 }
 .frame > *:last-child{margin-bottom:0}
 .creature video{
+  position:absolute;inset:0;                /* stacked, so neither adds height */
   width:100%;height:100%;object-fit:contain;display:block;
   filter:brightness(1.05);
 }
+/* the artifact skeleton provides this, a plain file does not */
+[hidden]{display:none!important}
 .eye{
   position:absolute;transform:translate(-50%,-50%);
   width:clamp(13px,1.5vw,21px);aspect-ratio:1;border-radius:50%;
@@ -203,7 +207,8 @@ h2{
 
 .card{position:relative;padding:0;gap:0}
 .card .thumb{
-  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
+  display:block;width:100%;height:auto;      /* beats the width/height attributes */
+  aspect-ratio:16/9;object-fit:cover;
   object-position:center;background:#0d0d0d;
 }
 video.thumb{pointer-events:none}
