@@ -13,6 +13,8 @@
   --cream-dim:#c9c5ba;
   --beige:#cfbb95;
   --leaf:#9fbf6a;
+  --bloom-in:232,122,184;     /* pink core */
+  --bloom-out:132,72,208;     /* purple falloff */
   --line:#2a2a30;
   --muted:#7d7a85;
   --font-display:"Anton",Impact,"Arial Narrow",sans-serif;
@@ -150,7 +152,25 @@ body[data-navopen="true"]{overflow:hidden}
   opacity:0;transition:opacity .5s ease;
 }
 .eye[data-ready="true"]{opacity:1}
-.eye i{display:block;width:30%;height:30%;border-radius:50%;background:#16301b;will-change:transform}
+.eye i{display:block;width:30%;height:30%;border-radius:50%;background:#16301b;will-change:transform;position:relative;z-index:1}
+
+/* the one bit of colour on the page, and it belongs to the only live element.
+   Blends inside .creature, so it lights the strands rather than the page. */
+.bloom{
+  position:absolute;left:50%;top:50%;z-index:0;
+  width:100vmax;height:100vmax;max-width:2200px;max-height:2200px;
+  transform:translate(-50%,-50%) scale(var(--gs,1));
+  pointer-events:none;mix-blend-mode:screen;border-radius:50%;
+  background:radial-gradient(circle closest-side,
+    rgba(var(--bloom-in),.42) 0%,
+    rgba(var(--bloom-in),.24) 12%,
+    rgba(var(--bloom-out),.15) 28%,
+    rgba(var(--bloom-out),.07) 48%,
+    rgba(var(--bloom-out),.025) 68%,
+    rgba(0,0,0,0) 92%);
+  opacity:var(--go,0);
+  will-change:opacity,transform;
+}
 
 /* ---------- hero ---------- */
 .hero{margin-top:auto;position:relative;z-index:2;padding-block:0 8px}
@@ -336,7 +356,7 @@ html{scroll-behavior:smooth}
   <div class="creature" id="creature">
     <video id="vid" muted loop playsinline preload="auto" aria-hidden="true"></video>
     <video id="viddown" muted playsinline preload="auto" aria-hidden="true" hidden></video>
-    <div class="eye" id="eye"><i id="pupil"></i></div>
+    <div class="eye" id="eye"><b class="bloom" id="bloom" aria-hidden="true"></b><i id="pupil"></i></div>
   </div>
   <div class="rule" aria-hidden="true"></div>
 
@@ -561,17 +581,17 @@ html{scroll-behavior:smooth}
       // the first 24 frames hold on the idle pose; skipping them makes the
       // descent answer the scroll straight away
       fps:24, loop:false, startAt:1.0,
-      holdFor:0.4,       // pause this far into the clip, on the first reach
+      holdFor:1.6,       // pause once the arm has clearly left the idle pose
       resumeAfter:0.9    // and wait until this much MORE of a screen is scrolled
     }
   };
 
   // boil values carried over from the previs rig
-  const BOIL = {peak:21, len:550, rate:13, freq:0.008, oct:1};
+  const BOIL = {peak:21, len:550, rate:13, freq:0.008, oct:1, hold:5};
 
   // how far down the page the descent fires, as a fraction of viewport height.
   // Two thresholds so a scroll that hovers on the line doesn't flap.
-  const TRIP_DOWN = 0.12, TRIP_UP = 0.04;
+  const TRIP_DOWN = 0.38, TRIP_UP = 0.10;
 
   const VIDEO_SRC = CLIPS.idle.src;
   const TRACK_SRC = CLIPS.idle.track;
@@ -608,6 +628,7 @@ html{scroll-behavior:smooth}
   const vidD = document.getElementById('viddown');
   const eye = document.getElementById('eye');
   const pup = document.getElementById('pupil');
+  const bloom = document.getElementById('bloom');
   const box = document.getElementById('creature');
   const loader = document.getElementById('loader');
 
@@ -615,6 +636,8 @@ html{scroll-behavior:smooth}
   let trackD = null, state = 'idle';   // idle | down
   let px = 0, py = 0, cx = 0.5, cy = 0.5, pointerSeen = false;
   let glance = {x:0, y:0}, glanceAt = 0;
+  let gLevel = 0;                     // eased attention, 0..1
+  const GLOW_REST = 0.05, GLOW_FULL = 0.40, GLOW_REACH = 0.52;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const stat = document.getElementById('stat');
@@ -796,6 +819,8 @@ html{scroll-behavior:smooth}
       lastSeed = now;
     }
     let scale = 0;
+    // a held pose reads as a stall unless the lines keep moving
+    if(!boilAt && holding && state === 'down' && !reduce) scale = BOIL.hold;
     if(boilAt){
       const k = Math.min(1, (now - boilAt) / BOIL.len);
       const tri = k < 0.5 ? k * 2 : (1 - k) * 2;
@@ -883,6 +908,15 @@ html{scroll-behavior:smooth}
         glanceAt = performance.now() + 1600 + Math.random()*4200;
       }
       if(!(pointerSeen && d < 1.1)){ tx = glance.x; ty = glance.y; }
+
+      // brighter the closer the cursor is; it rests low rather than going dark,
+      // so the bloom still travels with the head through the descent
+      const attn = (pointerSeen && d < GLOW_REACH) ? (1 - d / GLOW_REACH) : 0;
+      gLevel += (attn - gLevel) * 0.06;
+      if(bloom){
+        bloom.style.setProperty('--go', (GLOW_REST + gLevel * (GLOW_FULL - GLOW_REST)).toFixed(3));
+        bloom.style.setProperty('--gs', (0.80 + gLevel * 0.42).toFixed(3));
+      }
 
       const m = Math.hypot(tx, ty) || 1;
       const reach = Math.min(1, m / 0.3) * (eye.offsetWidth * 0.26);
