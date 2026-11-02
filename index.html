@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Matty Bissell</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
@@ -123,7 +124,7 @@ body[data-navopen="true"]{overflow:hidden}
   will-change:transform;
 }
 .rule{
-  position:absolute;z-index:0;left:0;right:0;top:64%;
+  position:absolute;z-index:0;left:0;right:0;top:var(--rule-y, 64%);
   border-top:1px dashed #33333d;pointer-events:none;will-change:transform;
 }
 
@@ -274,6 +275,15 @@ video.thumb{pointer-events:none}
 }
 .panel .out:hover{background:var(--leaf);color:#0b0b0d}
 .panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.outs{display:flex;gap:10px;flex-wrap:wrap}
+.card .body p a{
+  position:relative;z-index:2;          /* above the stretched card button */
+  color:inherit;text-decoration:underline;
+  text-underline-offset:3px;text-decoration-thickness:1.5px;
+  text-decoration-color:rgba(20,19,15,.45);
+}
+.card .body p a:hover{text-decoration-color:currentColor}
+.card.dark .body p a{text-decoration-color:rgba(233,230,222,.45)}
 .panel .note a{
   color:var(--cream);text-decoration:underline;
   text-underline-offset:3px;text-decoration-color:var(--leaf);
@@ -335,6 +345,7 @@ footer{
   .burger{display:flex}
   .topbar{align-items:center;padding-block:16px 12px}
   .creature{width:min(1000px,185vw);--creature-y:80%}
+  .rule{--rule-y:24%}                 /* up near the header, out of the void */
   .hero{padding-block:30px 34px}
   .frame{padding:22px 20px 24px}
 }
@@ -426,7 +437,7 @@ html{scroll-behavior:smooth}
                  preload="metadata" width="1080" height="1920" aria-label="Metamorphosis teaser"></video>
           <div class="body">
             <h3><button type="button" aria-expanded="false" aria-controls="p-metamorphosis">Metamorphosis</button></h3>
-            <p>Cut, chop, glue, sew, grow, grow, grow &hellip; pop. Take flight.</p>
+            <p><a href="https://www.instagram.com/metamorphosis_unisc2026/" target="_blank" rel="noopener">Cut, chop, glue, sew, grow, grow, grow &hellip; pop. Take flight.</a></p>
             <div class="foot">
               <span class="tag">Motion · 2026</span>
               <span class="chev" aria-hidden="true">&#9660;</span>
@@ -434,7 +445,11 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-metamorphosis"><div><div class="inner">
-          <p class="note">In progress. The full piece lands here when it is cut.</p>
+          <p class="note">Made for the 2026 Metamorphosis exhibition at UniSC and cut for social. The brand kit was supplied, so the work sat in the timing: eight seconds to carry a fixed set of marks through a change.</p>
+          <div class="outs">
+            <a class="out" href="https://www.instagram.com/metamorphosis_unisc2026/" target="_blank" rel="noopener">Metamorphosis 2026 <span aria-hidden="true">&#8599;</span></a>
+            <a class="out" href="https://www.instagram.com/uniscartgallery/" target="_blank" rel="noopener">UniSC Art Gallery <span aria-hidden="true">&#8599;</span></a>
+          </div>
         </div></div></div>
       </div>
 
@@ -639,6 +654,8 @@ html{scroll-behavior:smooth}
   let gLevel = 0;                     // eased attention, 0..1
   let GLOW_REST = 0.25, GLOW_FULL = 0.71, GLOW_REACH = 0.58;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // phones skip the boil and the hold: one move down to the rest pose
+  const plain = () => reduce || matchMedia('(max-width: 680px)').matches;
 
   const stat = document.getElementById('stat');
   function say(m){ if(stat) stat.textContent = m; }
@@ -795,8 +812,8 @@ html{scroll-behavior:smooth}
 
   function startBoil(to){
     if(boilAt || to === state || !trackD || !haveVideo) return;
-    // reduced motion loses the agitation, not the clip change
-    if(reduce){ doSwap(to); return; }
+    // reduced motion and phones lose the agitation, not the clip change
+    if(plain()){ doSwap(to); return; }
     boilTo = to; boilSwapped = false; boilAt = performance.now();
   }
 
@@ -805,7 +822,7 @@ html{scroll-behavior:smooth}
       vid.pause();
       vid.hidden = true;
       vidD.hidden = false;
-      holding = true;                 // released when the scroll carries on
+      holding = !plain();             // phones run it straight through
       trippedAt = scrollY;            // measured from here, not from the top
 
       const t = CLIPS.down.startAt;
@@ -838,7 +855,7 @@ html{scroll-behavior:smooth}
     }
     let scale = 0;
     // a held pose reads as a stall unless the lines keep moving
-    if(!boilAt && holding && state === 'down' && !reduce) scale = BOIL.hold;
+    if(!boilAt && holding && state === 'down' && !plain()) scale = BOIL.hold;
     if(boilAt){
       const k = Math.min(1, (now - boilAt) / BOIL.len);
       const tri = k < 0.5 ? k * 2 : (1 - k) * 2;
