@@ -591,7 +591,7 @@ html{scroll-behavior:smooth}
 
   // how far down the page the descent fires, as a fraction of viewport height.
   // Two thresholds so a scroll that hovers on the line doesn't flap.
-  const TRIP_DOWN = 0.48, TRIP_UP = 0.05;
+  let TRIP_DOWN = 0.38, TRIP_UP = 0.10;
 
   const VIDEO_SRC = CLIPS.idle.src;
   const TRACK_SRC = CLIPS.idle.track;
@@ -637,7 +637,7 @@ html{scroll-behavior:smooth}
   let px = 0, py = 0, cx = 0.5, cy = 0.5, pointerSeen = false;
   let glance = {x:0, y:0}, glanceAt = 0;
   let gLevel = 0;                     // eased attention, 0..1
-  const GLOW_REST = 0.05, GLOW_FULL = 0.40, GLOW_REACH = 0.52;
+  let GLOW_REST = 0.05, GLOW_FULL = 0.40, GLOW_REACH = 0.52;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const stat = document.getElementById('stat');
@@ -933,7 +933,8 @@ html{scroll-behavior:smooth}
     const panel = document.createElement('div');
     panel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:99;' +
       'background:#000;border:1px solid #9fbf6a;color:#9fbf6a;' +
-      'font:11.5px/1.5 ui-monospace,monospace';
+      'font:11.5px/1.5 ui-monospace,monospace;' +
+      'max-height:calc(100vh - 20px);overflow:auto;max-width:min(340px,calc(100vw - 20px))';
     const d = document.createElement('pre');
     d.style.cssText = 'margin:0;padding:10px 12px 8px;white-space:pre';
     const bar = document.createElement('div');
@@ -979,6 +980,64 @@ html{scroll-behavior:smooth}
       vid.load();
       report(vid.play());
     });
+
+    // ---- live tuning. Values print back so they can be pasted into the file.
+    const tune = document.createElement('div');
+    tune.style.cssText = 'padding:2px 12px 10px;display:flex;flex-direction:column;gap:7px;' +
+      'border-top:1px solid #2a2a30;margin-top:2px;min-width:290px';
+    panel.insertBefore(tune, note);
+
+    const out = document.createElement('pre');
+    out.style.cssText = 'margin:6px 0 0;padding:8px 9px;white-space:pre-wrap;' +
+      'background:#0d0d10;border:1px solid #2a2a30;color:#cfbb95;font:10.5px/1.5 ui-monospace,monospace';
+
+    const knobs = [];
+    function knob(label, min, max, step, get, set){
+      const row = document.createElement('label');
+      row.style.cssText = 'display:block;font:10.5px ui-monospace,monospace;color:#9fbf6a';
+      const cap = document.createElement('span');
+      cap.style.cssText = 'display:flex;justify-content:space-between;gap:10px';
+      const val = document.createElement('b');
+      val.style.cssText = 'color:#E3DACF;font-weight:400';
+      cap.append(document.createTextNode(label), val);
+      const r = document.createElement('input');
+      r.type = 'range'; r.min = min; r.max = max; r.step = step;
+      r.style.cssText = 'width:100%;accent-color:#9fbf6a;margin:3px 0 0';
+      r.value = get();
+      val.textContent = (+r.value).toFixed(step < 1 ? 2 : 0);
+      r.addEventListener('input', () => {
+        set(+r.value);
+        val.textContent = (+r.value).toFixed(step < 1 ? 2 : 0);
+        dump();
+      });
+      row.append(cap, r);
+      tune.appendChild(row);
+      knobs.push({label, get});
+    }
+
+    function dump(){
+      out.textContent = knobs.map(k => k.label.padEnd(13) + (+k.get()).toFixed(2)).join('\n');
+    }
+
+    knob('trip down',   0.05, 1.50, 0.01, () => TRIP_DOWN,              v => TRIP_DOWN = v);
+    knob('trip up',     0.00, 0.60, 0.01, () => TRIP_UP,                v => TRIP_UP = v);
+    knob('hold at',     0.20, 6.00, 0.05, () => CLIPS.down.holdFor,     v => CLIPS.down.holdFor = v);
+    knob('resume after',0.10, 3.00, 0.05, () => CLIPS.down.resumeAfter, v => CLIPS.down.resumeAfter = v);
+    knob('boil peak',   0,    48,   1,    () => BOIL.peak,              v => BOIL.peak = v);
+    knob('boil hold',   0,    20,   1,    () => BOIL.hold,              v => BOIL.hold = v);
+    knob('glow full',   0,    1,    0.01, () => GLOW_FULL,              v => GLOW_FULL = v);
+    knob('glow rest',   0,    0.5,  0.01, () => GLOW_REST,              v => GLOW_REST = v);
+    knob('glow reach',  0.1,  1.5,  0.01, () => GLOW_REACH,             v => GLOW_REACH = v);
+    knob('bloom vmax',  20,  180,   1,    () => parseFloat(getComputedStyle(bloom).width) /
+                                                 (Math.max(innerWidth, innerHeight) / 100),
+                                          v => { bloom.style.width = v + 'vmax';
+                                                 bloom.style.height = v + 'vmax'; });
+    tune.appendChild(out);
+    dump();
+
+    btn('descend', () => startBoil('down'));
+    btn('rise',    () => startBoil('idle'));
+    btn('release', () => { holding = false; vidD.play().catch(() => {}); });
     const RS = ['NOTHING','METADATA','CURRENT','FUTURE','ENOUGH'];
     const NS = ['EMPTY','IDLE','LOADING','NO_SOURCE'];
     setInterval(() => {
