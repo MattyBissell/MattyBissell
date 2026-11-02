@@ -158,7 +158,7 @@ body[data-navopen="true"]{overflow:hidden}
    Blends inside .creature, so it lights the strands rather than the page. */
 .bloom{
   position:absolute;left:50%;top:50%;z-index:0;
-  width:100vmax;height:100vmax;max-width:2200px;max-height:2200px;
+  width:88vmax;height:88vmax;max-width:2000px;max-height:2000px;
   transform:translate(-50%,-50%) scale(var(--gs,1));
   pointer-events:none;mix-blend-mode:screen;border-radius:50%;
   background:radial-gradient(circle closest-side,
@@ -581,17 +581,17 @@ html{scroll-behavior:smooth}
       // the first 24 frames hold on the idle pose; skipping them makes the
       // descent answer the scroll straight away
       fps:24, loop:false, startAt:1.0,
-      holdFor:1.6,       // pause once the arm has clearly left the idle pose
-      resumeAfter:0.9    // and wait until this much MORE of a screen is scrolled
+      holdFor:0.25,      // pause this far into the clip, on the first reach
+      resumeAfter:0.30   // and wait until this much MORE of a screen is scrolled
     }
   };
 
   // boil values carried over from the previs rig
-  const BOIL = {peak:21, len:550, rate:13, freq:0.008, oct:1, hold:5};
+  const BOIL = {peak:9, len:550, rate:13, freq:0.008, oct:1, hold:2};
 
   // how far down the page the descent fires, as a fraction of viewport height.
   // Two thresholds so a scroll that hovers on the line doesn't flap.
-  let TRIP_DOWN = 0.38, TRIP_UP = 0.10;
+  let TRIP_DOWN = 0.14, TRIP_UP = 0.06;
 
   const VIDEO_SRC = CLIPS.idle.src;
   const TRACK_SRC = CLIPS.idle.track;
@@ -637,7 +637,7 @@ html{scroll-behavior:smooth}
   let px = 0, py = 0, cx = 0.5, cy = 0.5, pointerSeen = false;
   let glance = {x:0, y:0}, glanceAt = 0;
   let gLevel = 0;                     // eased attention, 0..1
-  let GLOW_REST = 0.05, GLOW_FULL = 0.40, GLOW_REACH = 0.52;
+  let GLOW_REST = 0.25, GLOW_FULL = 0.71, GLOW_REACH = 0.58;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const stat = document.getElementById('stat');
@@ -773,6 +773,14 @@ html{scroll-behavior:smooth}
   // ---- descent clip, loaded quietly alongside ----
   vidD.src = CLIPS.down.src;
   vidD.load();
+  // Park it on its start frame up front. Seeking is async, so seeking and
+  // playing in the same tick lets it run from 0 until the seek lands.
+  function parkDown(){
+    if(vidD.readyState < 1) return false;
+    try { vidD.currentTime = CLIPS.down.startAt; } catch(e){}
+    return true;
+  }
+  vidD.addEventListener('loadedmetadata', parkDown, {once:true});
   fetch(CLIPS.down.track)
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(raw => { trackD = raw.map(p => ({x:+p[0], y:+p[1]})); })
@@ -797,10 +805,19 @@ html{scroll-behavior:smooth}
       vid.pause();
       vid.hidden = true;
       vidD.hidden = false;
-      vidD.currentTime = CLIPS.down.startAt;
       holding = true;                 // released when the scroll carries on
       trippedAt = scrollY;            // measured from here, not from the top
-      vidD.play().catch(() => {});
+
+      const t = CLIPS.down.startAt;
+      const play = () => vidD.play().catch(() => {});
+      if(vidD.readyState < 1){
+        vidD.addEventListener('loadedmetadata', () => { parkDown(); play(); }, {once:true});
+      } else if(Math.abs(vidD.currentTime - t) > 0.02){
+        vidD.addEventListener('seeked', play, {once:true});   // wait for the seek
+        vidD.currentTime = t;
+      } else {
+        play();                                               // already parked
+      }
     } else {
       vidD.pause();
       vidD.hidden = true;
@@ -809,6 +826,7 @@ html{scroll-behavior:smooth}
       vid.playbackRate = 1;         // breath may have left it slow
       holding = false;
       vid.play().catch(() => {});
+      parkDown();                   // ready for the next descent
     }
     state = to;
   }
