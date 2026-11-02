@@ -744,10 +744,18 @@ html{scroll-behavior:smooth}
     down: 1900,                       // time to bleed off speed
     holdMin: 900, holdMax: 2800,      // length of the near-stop
     up: 2400,                         // time to come back
-    low: 0.06,                        // rate held at: not 0, so it still drifts
+    low: 0.10,                        // held rate; browsers reject under ~0.0625
     phase: 'wait'
   };
   window.__breath = BREATH;
+
+  // Chrome and Safari throw NotSupportedError below about 0.0625, and the
+  // breath writes a rate every frame, so clamp once here instead.
+  function setRate(r){
+    const c = Math.min(4, Math.max(0.1, r));
+    if(Math.abs(vid.playbackRate - c) < 0.002) return;
+    try { vid.playbackRate = c; } catch(e){}
+  }
 
   (function breath(){
     const B = BREATH;
@@ -767,7 +775,7 @@ html{scroll-behavior:smooth}
 
       } else if(B.phase === 'down'){
         const k = Math.min(1, e / B.down);
-        vid.playbackRate = 1 + (B.low - 1) * smooth(k);
+        setRate(1 + (B.low - 1) * smooth(k));
         if(k >= 1){ B.phase = 'hold'; t0 = now; hold = rand(B.holdMin, B.holdMax); }
 
       } else if(B.phase === 'hold'){
@@ -775,9 +783,9 @@ html{scroll-behavior:smooth}
 
       } else {
         const k = Math.min(1, e / B.up);
-        vid.playbackRate = B.low + (1 - B.low) * smooth(k);
+        setRate(B.low + (1 - B.low) * smooth(k));
         if(k >= 1){
-          vid.playbackRate = 1;
+          setRate(1);
           B.phase = 'wait'; t0 = now; wait = rand(B.waitMin, B.waitMax);
         }
       }
@@ -840,7 +848,7 @@ html{scroll-behavior:smooth}
       vidD.hidden = true;
       vid.hidden = false;
       vid.currentTime = 0;          // descent frame 0 and idle frame 0 share a pose
-      vid.playbackRate = 1;         // breath may have left it slow
+      setRate(1);                   // breath may have left it slow
       holding = false;
       vid.play().catch(() => {});
       parkDown();                   // ready for the next descent
