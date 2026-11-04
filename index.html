@@ -291,9 +291,12 @@ video.thumb{pointer-events:none}
 }
 .panel .note a:hover{color:var(--leaf)}
 .panel .clip{
-  display:block;width:100%;max-width:380px;height:auto;
+  display:block;width:100%;height:auto;
+  max-width:min(360px, 68vw);
+  aspect-ratio:9/16;object-fit:contain;
   border:1px solid var(--line);background:#0d0d0d;
 }
+@media (max-width:680px){ .panel .clip{max-width:min(300px, 82vw)} }
 
 .c-wide{grid-column:span 7}
 .c-side{grid-column:span 5}
@@ -335,7 +338,7 @@ footer{
 }
 
 @media (max-width: 900px){
-  .creature{--creature-y:82%;width:min(1400px,150vw)}
+  .creature{--creature-y:62%;width:min(1400px,150vw)}
   nav.desk a{min-width:150px;font-size:14px}
   .c-wide,.c-side,.c-half{grid-column:span 12}   /* single column from here down */
   .frame{max-width:none}
@@ -344,7 +347,7 @@ footer{
   nav.desk{display:none}
   .burger{display:flex}
   .topbar{align-items:center;padding-block:16px 12px}
-  .creature{width:min(1000px,185vw);--creature-y:80%}
+  .creature{width:min(1000px,185vw);--creature-y:50%}
   .rule{--rule-y:24%}                 /* up near the header, out of the void */
   .hero{padding-block:30px 34px}
   .frame{padding:22px 20px 24px}
@@ -445,7 +448,10 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-metamorphosis"><div><div class="inner">
-          <p class="note">Made for the 2026 Metamorphosis exhibition at UniSC and cut for social. The brand kit was supplied, so the work sat in the timing: eight seconds to carry a fixed set of marks through a change.</p>
+          <video class="clip" src="images/work/mm_coming_soon.mp4" muted loop playsinline
+                 controls preload="none" width="1080" height="1920"
+                 aria-label="Metamorphosis teaser, full vertical cut"></video>
+          <p class="note">Motion piece for UniSC's 2026 Metamorphosis exhibition, built from a supplied brand kit. The kit set the colours, type and graphic language, and I developed the narrative and animation inside those rules: the exhibition mark unfolds from a flat glyph into a moth, lifts off, and settles over a field of flowers as the title resolves. Cut for social as a 9:16 vertical alongside a 16:9 master, so the campaign could run across platforms without losing the kit's consistency. Built in Illustrator, After Effects and Premiere.</p>
           <div class="outs">
             <a class="out" href="https://www.instagram.com/metamorphosis_unisc2026/" target="_blank" rel="noopener">Metamorphosis 2026 <span aria-hidden="true">&#8599;</span></a>
             <a class="out" href="https://www.instagram.com/uniscartgallery/" target="_blank" rel="noopener">UniSC Art Gallery <span aria-hidden="true">&#8599;</span></a>
@@ -1132,7 +1138,11 @@ html{scroll-behavior:smooth}
       b.setAttribute('aria-expanded', String(!open));
       // only the open panel's clip runs
       document.querySelectorAll('.panel video').forEach(v => { v.pause(); });
+      // the card's looping preview steps aside while the full clip is open
+      document.querySelectorAll('.card video.thumb').forEach(v => v.play().catch(() => {}));
       if(!open){
+        const t = item.querySelector('.card video.thumb');
+        if(t) t.pause();
         const v = item.querySelector('.panel video');
         if(v) v.play().catch(() => {});
       }
