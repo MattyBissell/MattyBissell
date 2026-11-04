@@ -231,6 +231,10 @@ h2{
 .item{min-width:0;display:flex;flex-direction:column}
 /* an open card takes the whole row, so the slide gets real size */
 .item[data-open="true"]{grid-column:1 / -1}
+/* ...and sheds its thumbnail, becoming a banner with the media below it */
+.item[data-open="true"] .card .thumb{display:none}
+.item[data-open="true"] .card .body{padding:22px 24px 18px}
+.item[data-open="true"] .card p{max-width:82ch}
 
 .card{position:relative;padding:0;gap:0}
 .card .thumb{
@@ -274,7 +278,7 @@ video.thumb{pointer-events:none}
   transition:background .15s,color .15s;
 }
 .panel .out:hover{background:var(--leaf);color:#0b0b0d}
-.panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.panel .note{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted);max-width:82ch}
 .outs{display:flex;gap:10px;flex-wrap:wrap}
 .card .body p a{
   position:relative;z-index:2;          /* above the stretched card button */
