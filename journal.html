@@ -32,6 +32,8 @@ body{
 }
 .shell{max-width:1180px;margin:0 auto}
 .read{max-width:68ch}
+html{scroll-behavior:smooth}
+:target{scroll-margin-top:24px}
 
 /* ---------- header ---------- */
 .topbar{
@@ -65,6 +67,27 @@ h1{
 }
 .standfirst{font-size:16.5px;color:var(--cream-dim);margin:0;max-width:60ch}
 
+/* ---------- contents ---------- */
+.toc{
+  margin-top:44px;border-top:1px solid var(--line);padding-top:20px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;
+}
+.toc h2{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--leaf);margin:0 0 10px;font-weight:400;
+  grid-column:1 / -1;
+}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc li{margin-bottom:5px}
+.toc .mo{
+  display:block;font-family:var(--font-display);font-size:21px;
+  color:var(--cream);text-decoration:none;margin-bottom:8px;letter-spacing:.01em;
+}
+.toc .mo:hover{color:var(--leaf)}
+.toc a{color:var(--cream-dim);text-decoration:none;font-size:13.5px}
+.toc a:hover{color:var(--leaf)}
+.toc .d{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-right:7px}
+
 /* ---------- months ---------- */
 .month{
   margin-top:60px;padding-top:14px;border-top:1px solid var(--line);
@@ -89,6 +112,9 @@ h1{
 .entry p{margin:0 0 14px;color:var(--cream-dim)}
 .entry p:last-child{margin-bottom:0}
 .entry strong{color:var(--cream);font-weight:600}
+.entry a{color:var(--cream);text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--leaf);text-decoration-thickness:1.5px}
+.entry a:hover{color:var(--leaf)}
 
 figure{margin:22px 0}
 figure img{
@@ -97,7 +123,7 @@ figure img{
 }
 figcaption{
   font-family:var(--font-mono);font-size:11px;color:var(--muted);
-  margin-top:8px;letter-spacing:.04em;
+  margin-top:8px;letter-spacing:.04em;max-width:860px;
 }
 .plate{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;max-width:860px}
 .plate img{display:block;width:100%;height:auto;border:1px solid var(--line);background:#0d0d10}
@@ -109,17 +135,23 @@ pre{
 }
 .entry ul{margin:0 0 14px;padding-left:20px;color:var(--cream-dim)}
 .entry li{margin-bottom:6px}
+.cite{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:52ch;margin:0 0 14px}
+.cite a{color:var(--muted);text-decoration-color:var(--line)}
 
-.empty{
-  border:1px dashed var(--line);padding:22px 24px;max-width:860px;
-  color:var(--muted);font-size:14.5px;
-}
+/* ---------- conclusion ---------- */
+.close{margin-top:60px;padding-top:14px;border-top:var(--stroke) solid var(--cream)}
+.close .entry{border-bottom:0}
+.close p{color:var(--cream-dim)}
 
 footer{
   margin-top:70px;padding-top:22px;border-top:1px solid var(--line);
-  display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);
+  display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;
+  font-size:13px;color:var(--muted);
 }
+footer .who{color:var(--cream);font-weight:600}
+footer .spacer{flex:1 1 auto}
 footer a{color:var(--cream-dim)}
+footer a:hover{color:var(--leaf)}
 @media (max-width:680px){
   nav{display:none}
   .mast{padding-block:36px 10px}
@@ -128,7 +160,7 @@ footer a{color:var(--cream-dim)}
 
 <div class="shell">
 
-  <div class="topbar">
+  <div class="topbar" id="top">
     <a class="wordmark" href="index.html" aria-label="Matty Bissell, home">
       <img src="images/header_MattyWordmark_V1.svg" alt="Matty Bissell">
     </a>
@@ -146,286 +178,308 @@ footer a{color:var(--cream-dim)}
     <p class="standfirst">Weird Weeds, from a moodboard in August to a presence-responsive creature on a gallery monitor in October. Kept as I went, trimmed afterwards.</p>
   </header>
 
-  <!-- ================= AUGUST ================= -->
-  <div class="month"><h2>August</h2><span>Ideation and identity</span></div>
+  <!-- ================= CONTENTS ================= -->
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <a class="mo" href="#august">August</a>
+      <li><a href="#aug-05"><span class="d">05</span>Where I sit in design</a></li>
+      <li><a href="#aug-11"><span class="d">11</span>Prototypes</a></li>
+      <li><a href="#aug-19"><span class="d">19</span>Finding the thread</a></li>
+      <li><a href="#aug-23"><span class="d">23</span>Fixed digital twin</a></li>
+      <li><a href="#aug-29"><span class="d">29</span>Defining the interaction</a></li>
+    </ol>
+    <ol>
+      <a class="mo" href="#september">September</a>
+      <li><a href="#sep-05"><span class="d">05</span>Nodes</a></li>
+      <li><a href="#sep-12"><span class="d">12</span>Expected response in the gallery</a></li>
+      <li><a href="#sep-14"><span class="d">14</span>Feedback</a></li>
+      <li><a href="#sep-16"><span class="d">16</span>Planning eye states</a></li>
+      <li><a href="#sep-28"><span class="d">28</span>Character profiles</a></li>
+    </ol>
+    <ol>
+      <a class="mo" href="#october">October</a>
+      <li><a href="#oct-05"><span class="d">05</span>Geo Nodes, Unreal, TouchDesigner</a></li>
+      <li><a href="#oct-14"><span class="d">14</span>Touch measurements</a></li>
+      <li><a href="#oct-18"><span class="d">18</span>Mote field</a></li>
+      <li><a href="#oct-22"><span class="d">22</span>The whole chain</a></li>
+    </ol>
+    <ol>
+      <a class="mo" href="#close">After</a>
+      <li><a href="#close"><span class="d">24</span>The exhibition</a></li>
+      <li><a href="#close">What I would change</a></li>
+      <li><a href="#close">Where it goes</a></li>
+    </ol>
+  </nav>
 
-  <article class="entry read">
+  <!-- ================= AUGUST ================= -->
+  <div class="month" id="august"><h2>August</h2><span>Ideation and identity</span></div>
+
+  <article class="entry read" id="aug-05">
     <p class="date">5 August</p>
     <h3>Where I sit in design</h3>
-    <p>Spent the first week on what story I want to tell and what interaction I want someone to have in front of the capstone. Looking to continue the thinking from <strong>Hello Stranger</strong> and its themes of non-places, inspired by how Airship Orchestra set up in those spaces and turn them into places of wonder. A piece that does that on a much smaller scale.</p>
-    <p>Started a Figma board for reference images and workshop notes, and did the first searches on naming and online footprint. My old branding was MJBissell, which feels like a real estate agent. Matty Bissell reads better, though MattyB is a large American YouTuber, so not a legal problem but a search one.</p>
+    <p>Much of the early thinking revolved around my place in the world of design. What job am I aiming for, and what kind of energy do I want to put out into the world? Starting a Figma and a PureRef board helped get the ideas moving.</p>
+    <p>Running alongside the capstone, as a transition to industry, I have also been working on my own personal branding. As with all creative work, the two bleed into each other.</p>
     <div class="plate">
-      <img src="images/journal/image-5.png" alt="Moodboard reference" loading="lazy">
-      <img src="images/journal/image-2.png" alt="Moodboard reference" loading="lazy">
+      <img src="images/journal/aug-01.jpg" alt="Still from Phoebe Paradise's Procreate Dreams animation: a glowing figure against a sunset gradient" loading="lazy">
+      <img src="images/journal/aug-02.jpg" alt="Two early Unreal tests side by side, labelled Simple IK Chain and weird weed, and Bug Legs wiggle and spider shadows" loading="lazy">
     </div>
+    <p class="cite">Paradise, P. [@phoebe.paradise]. (2026, May 19). <em>Finally got around to experimenting with the amazing Procreate Dreams while recovering from surgery and the more I worked</em> [Video]. Instagram. <a href="https://www.instagram.com/reel/DYhFF6eTtkb/" target="_blank" rel="noopener">instagram.com/reel/DYhFF6eTtkb</a></p>
+    <p>A few early ideas came out of <strong>Hello Stranger</strong>. That supermarket project has an interesting interactive stack: TouchDesigner and MediaPipe piped into Unreal over an OSC server, so the geometry, particles, lighting, materials and Blueprint logic can all be driven by outputs derived from a plain video feed. It is a fairly unusual way to build an environment.</p>
+    <p>The Paradise piece above was a good early reference for the potential of a plant driven by the detected user, with other data, such as the observers, driving the light behind it.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">August</p>
-    <h3>Wordmark</h3>
-    <p>Doodling letterforms, looking at negative space for any interesting interplay. A lot of the hand-sketched versions spoke to the scramble-brain aesthetic that feels on brand, but in vector they looked plain.</p>
-    <p>The wordmark that worked is geometric outside with softer characterised inner shapes: nudges toward feet, limbs and a wink in the negative space and on the letter spines. BISSELL is <strong>Iosevka Charon Mono</strong>, an open-source monospace built for terminals, a solid anchor under the playful growth of the MATTY characters. A reverse mullet. Business underneath, party on top.</p>
-    <div class="plate">
-      <img src="images/journal/image-3.png" alt="Letterform sketches" loading="lazy">
-      <img src="images/journal/image-1.png" alt="Letterform sketches" loading="lazy">
-      <img src="images/journal/image.png" alt="Wordmark in vector" loading="lazy">
-    </div>
-  </article>
-
-  <article class="entry read">
+  <article class="entry read" id="aug-11">
     <p class="date">11 August</p>
-    <h3>Touchpoints</h3>
-    <p>Ethically and optically it is uncomfortable to be on LinkedIn given the current climate of big tech, but most of my past work and contacts are there, so it still needs updating. Stepping out of my comfort zone and using a portrait, very Rembrandt, who was a favourite growing up. Master of light and shadow, which became a large vector of development in 3D graphics as we moved to simulating photons and bounce light.</p>
+    <h3>Prototypes</h3>
+    <p>Getting the project running end to end is the biggest priority, so I can test both the functionality and the concept with people.</p>
+    <p>That meant a simple four-bone chain skinned to an object, mapped to mouse movement for now.</p>
     <figure>
-      <img src="images/journal/image-4.png" alt="Profile portrait" loading="lazy">
+      <img src="images/journal/aug-03.jpg" alt="Four-panel Blender to Unreal test: a bent bone chain, a sphere with a bone, and two node graphs" loading="lazy">
+      <figcaption>Blender to Unreal, first pass</figcaption>
     </figure>
+    <p>Had the usual trouble with scale and export settings, so smoothing those workflows out early is always worth it. Creating the Blueprint and the skeletal mesh is straightforward enough. Transforming and rotating bones can be driven by different values down the chain, and here I am multiplying the bend factor by increments.</p>
+    <figure>
+      <img src="images/journal/aug-04.jpg" alt="Colour studies: a figure silhouetted against a flat red field, and the same shape against pink and blue" loading="lazy">
+      <figcaption>Vivid values against shadow</figcaption>
+    </figure>
+    <p>On theme, the early visual tests have been looking at vivid values against shadow, used to good effect in Disney's <em>Fantasia</em>.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">August</p>
-    <h3>The statement</h3>
-    <p>I came to design late, after a lot of other jobs. That history is the useful part. For a long time I thought being good at art meant being accurate, so I studied anatomy and Leonardo and drew realistically. My hand never agreed. The discipline stuck and still runs underneath everything, but it stopped being the output and became the foundation.</p>
-    <p>What I want to make now are non-places that stop being non-places. Airports, waiting rooms, service centres, foyers. Spaces built for utility, where people are processed rather than met. I want to put something in them that surprises someone into a bit of joy.</p>
-    <p>This is for organisations responsible for spaces people have to pass through, physical or digital. A council foyer and a government form at eleven at night are the same problem in different media.</p>
-  </article>
-
-  <article class="entry read">
-    <p class="date">22 August</p>
-    <h3>Blender to Unreal</h3>
-    <p>First skinned mesh export, working out naming conventions and structure. The settings that actually matter, since the defaults disagree between the two applications:</p>
-    <pre>Apply Scalings   FBX All   Blender is metres, Unreal centimetres
-Forward          X         Blender defaults to -Y, Unreal expects X
-Primary Bone     X         matters when rotation is driven externally
-Add Leaf Bones   Off       otherwise every chain gets a junk _end bone
-Apply Transform  Off       inconsistent, and unnecessary after Ctrl+A</pre>
-    <p>Apply all transforms before export. An unapplied non-uniform scale corrupts weight deformation and follows the asset into Unreal where it is much harder to diagnose. Three things confirm a good import: the mesh stands upright, scale is sensible against a default cube, and the Skeleton tab has no <code>_end</code> entries.</p>
+  <article class="entry read" id="aug-19">
+    <p class="date">19 August</p>
+    <h3>Finding the thread</h3>
     <div class="plate">
-      <img src="images/journal/image-6.png" alt="Skinned mesh imported into Unreal" loading="lazy">
-      <img src="images/journal/image-7.png" alt="Animation blueprint setup" loading="lazy">
+      <img src="images/journal/aug-05.jpg" alt="Dark scene with a glowing plant form and a thin green ground line, labelled Style Exploration" loading="lazy">
+      <img src="images/journal/aug-06.jpg" alt="Reference board: a green spiral shader and a black and white stippled illustration" loading="lazy">
     </div>
-    <p>One petal to start, with a blueprint tracking the mouse cursor so the petals open on proximity. Get Mouse Position into Deproject Screen to World, then heavy interpolation because the raw mouse is far too fast.</p>
-    <div class="plate">
-      <img src="images/journal/image-8.png" alt="Blueprint cursor tracking" loading="lazy">
-      <img src="images/journal/image-9.png" alt="Look at node on the stem" loading="lazy">
-    </div>
-    <p>Working on this I looked out the campus window at palm fronds dancing in the wind, which got me onto the tactile nature of vision, and what wind actually is as a thing you see rather than feel. The mouse-and-plant test gave me a stem with a look-at node orienting toward an interpolated cursor position, which TouchDesigner and MediaPipe will eventually drive with a head approximation.</p>
+    <p>Thinking about a more abstract way to present the scene and the object. A scribbly doodled style feels appropriate and a bit nostalgic. That kind of rendering could be faked with spline geometry and ribbon particles, though a custom HLSL shader is also an option for cross-hatching.</p>
+    <p>The second image is Spirals on Spirals, which throws out an interesting outward pattern. The high fluorescent blues, whites and greens could work as a dopamine pulse of happiness, going grey when still. The stippling reminds me of the cover of Shaun Tan's <em>The Night</em>, and it raises the idea of rendering the scene in a similar way: a hatch shader, or simple white on edge detection, possibly with a flipped and offset geometry trick.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">August</p>
-    <h3>Looking at shaders</h3>
-    <p>Shadertoy is a good place to see what is possible in fragment shader code. One render had a greasy paint quality on a ball that is hard to replicate in computer graphics and close to how I picture the bloom on top of the stalk. Another, spirals on spirals, throws out high fluorescent blues and greens that could work as a dopamine pulse, going grey when still.</p>
-    <p>The stippling reminded me of the cover of Shaun Tan's <em>The Night</em>. A stag running at night, good anticipation, freedom and excitement to come, against an otherwise inky environment. That inkiness is a direction worth holding onto.</p>
-    <div class="plate">
-      <img src="images/journal/image-10.png" alt="Shadertoy reference" loading="lazy">
-      <img src="images/journal/image-11.png" alt="Shadertoy reference" loading="lazy">
-      <img src="images/journal/image-12.png" alt="Shaun Tan reference" loading="lazy">
-    </div>
+  <article class="entry read" id="aug-23">
+    <p class="date">23 August</p>
+    <h3>Fixed digital twin</h3>
+    <p>Taking inspiration from Universal Everything's Digital Twin campaign. I liked the idea of raycasting, which is expensive, or a particle explosion on an observed skeleton. A lot of what makes that campaign work is the simulated weight and bounce.</p>
+    <figure>
+      <img src="images/journal/aug-07.jpg" alt="Grid of six sketches of plant figures, each paired with a small human silhouette for scale" loading="lazy">
+      <figcaption>Backyard plants as eclectic foliage figures</figcaption>
+    </figure>
+    <p>Sketching plants and weeds from my backyard as eclectic foliage figures. They could expand, grow and contract depending on how much movement or energy a user gives them. A generated surface populated with smaller plants, sudden blooms, tight spatial arrangements like phyllotaxis. If movement is slow, it leans toward broms, staghorn, old man's whiskers, trees.</p>
+    <p>Could be asset intensive.</p>
+    <figure>
+      <img src="images/journal/aug-08.jpg" alt="Four Blender renders of a pink bloom with an eye at its centre, each a different density" loading="lazy">
+      <figcaption>Previz of a plant head</figcaption>
+    </figure>
+    <p>Previz of a plant head in Blender. It should be possible to get a head bone and orientation from the distance between the ears, with nose tilt controlling different spheres of scattered sprite geometry.</p>
+    <figure>
+      <img src="images/journal/aug-09.jpg" alt="A red coiled spiral in the Blender viewport beside its geometry node graph" loading="lazy">
+      <figcaption>Geometry nodes along a spline</figcaption>
+    </figure>
+    <p>Testing geometry nodes along a spline. Exploring coiling and uncoiling, and collapsing the geometry node setup into two states with morph targets blending between them.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">August</p>
-    <h3>Weird weed orchestra</h3>
-    <p>Playing with a digital twin of my own yard. Lots of small repetitious granular flowers, large blooms unfurling like peacock feathers with high upbeat notes, lower trombones for the succulents and broms that spawn and shrink back down. More movement pushes the orchestra further. Distilling the happiness of the yard down into textures and materials, aiming at energy and growth, delicate under movement and hardy without it.</p>
-    <div class="plate">
-      <img src="images/journal/image-13.png" alt="Yard plant studies" loading="lazy">
-      <img src="images/journal/image-14.png" alt="Humanoid render reference" loading="lazy">
-      <img src="images/journal/image-15.png" alt="Sketches" loading="lazy">
-    </div>
-  </article>
-
-  <article class="entry read">
-    <p class="date">August</p>
-    <h3>Gallery constraints</h3>
-    <p>Practical considerations for the UniSC Art Gallery: power, a plinth to hide the laptop, webcam placement, networking, and the acoustics if there is audio.</p>
-    <p>Audience is general gallery visitors at the student showcase. Friends, family, other students, some industry. People can engage as much or as little as they like, and watching is a legitimate way to experience it. The piece is designed around the <strong>honeypot effect</strong>: people are drawn to interactive work by watching others use it, and the hard part is crossing from spectator to participant. The observer's behaviour is the interaction whether or not they step forward. Stillness is not a failure state.</p>
-    <figure><img src="images/journal/image-16.png" alt="Gallery planning" loading="lazy"></figure>
+  <article class="entry read" id="aug-29">
+    <p class="date">29 August</p>
+    <h3>Defining the interaction</h3>
+    <p>After trying to talk the interaction through with peers in a tutorial, I found I could not explain it easily. That is a good sign that I need to think the whole thing through end to end rather than fixating on the visual language.</p>
+    <figure>
+      <img src="images/journal/aug-10.jpg" alt="Two renders: a coiled gold form on a dark blue ground, and a black silhouette against pink" loading="lazy">
+    </figure>
+    <p>This was always partly a test of whether I could drive morph targets and bones from Unreal. The early version ran on deprojected mouse movement.</p>
+    <figure>
+      <img src="images/journal/aug-11.jpg" alt="Ideation board of colour studies, line drawings and interface screenshots arranged in a flow" loading="lazy">
+      <figcaption>Working board</figcaption>
+    </figure>
+    <p>The current idea is a silhouette of my backyard represented in gradients, with an amorphous weed that moves and reacts. Still, it fades to grey. With movement, the visuals build.</p>
+    <p><strong>Audience.</strong> General gallery visitors at the student showcase: friends, family, other students, some industry. People can engage as much or as little as they like, and watching is a legitimate way to experience it.</p>
+    <p>The piece is designed around the honeypot effect. People are drawn to interactive work by watching others use it, and the hard part is crossing from spectator to participant. The observer's behaviour is the interaction, whether or not they step forward.</p>
+    <p>Large movements unfurl the ribbons into something brief and joyous. Stillness is not a failure state. There is more to find for anyone who wants it, but the piece does not require it.</p>
   </article>
 
   <!-- ================= SEPTEMBER ================= -->
-  <div class="month"><h2>September</h2><span>Form and procedural build</span></div>
+  <div class="month" id="september"><h2>September</h2><span>Form and procedural build</span></div>
 
-  <article class="entry read">
-    <p class="date">September</p>
-    <h3>Depth from a line drawing</h3>
-    <p>Fed a loose line drawing through Depth Anything V2. Fascinating to watch it interpret something that imprecise. Opens a possible direction around gesture-based drawing processed into a 3D interpretation.</p>
-    <figure><img src="images/journal/image-17.png" alt="Depth map from a line drawing" loading="lazy"></figure>
+  <article class="entry read" id="sep-05">
+    <p class="date">5 September</p>
+    <h3>Nodes</h3>
+    <p>Much of the work here has been rethinking the geometry node setup.</p>
+    <figure>
+      <img src="images/journal/sep-01.jpg" alt="A blurred car park photograph with a red hand-drawn flower and figure sketched over it" loading="lazy">
+      <figcaption>Drawing the piece into a non-place</figcaption>
+    </figure>
+    <p>Getting the new geometry-node mesh to look at the cursor, which stands in for the user's head. Using absolute world space on Z is a highly effective way to get a hazy void. Artistically I am moving toward lit shaders, since pure emissive is a bit too formless at this stage. Materials need iterating sooner rather than later.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">13 September</p>
-    <h3>What the weeds look like</h3>
-    <p>Still quite fluid on the specific visuals, but gravitating toward procedural generation on the stems in Blender, which is both practical and a bit of fun. Heavily inspired by Universal Everything's technical explosion in their characters.</p>
-    <div class="plate">
-      <img src="images/journal/image-18.png" alt="Concept doodles" loading="lazy">
-      <img src="images/journal/image-19.png" alt="Procedural stem test" loading="lazy">
-      <img src="images/journal/image-20.png" alt="Procedural stem test" loading="lazy">
-    </div>
+  <article class="entry read" id="sep-12">
+    <p class="date">12 September</p>
+    <h3>Expected response in the gallery</h3>
+    <figure>
+      <img src="images/journal/sep-02.jpg" alt="Blender animation workspace: a bloom render above, the node graph below, with an animation label" loading="lazy">
+    </figure>
+    <p>If someone chooses to stay with the piece, that should still be rewarded and not read as a negative encounter. After all, they are choosing to stay.</p>
+    <p>I will have to think about not making the neutral state too mundane, or reading as depressing.</p>
   </article>
 
-  <article class="entry read">
+  <article class="entry read" id="sep-14">
     <p class="date">14 September</p>
-    <h3>An animator's read on anxiety</h3>
+    <h3>Feedback</h3>
+    <figure>
+      <img src="images/journal/sep-03.jpg" alt="Two small drawings: a pencil sketch of a figure, and a blue-ground line drawing of a bloom" loading="lazy">
+    </figure>
     <p>Refining the concept with Kali Maunder helped a great deal, thinking through the character from a traditional animator's perspective: the squash and tension in the body under anxiety, muscles bundling, hunched shoulders, eye stress lines.</p>
-    <p>That informed a fascicles setup in Geometry Nodes. A mesh curve becomes the stem's body, likely invisible, and the fascicles generate and twist around it. The bundle and twist is literal with the knots, radius staying the same at the base with potential to expand.</p>
+    <p>That informed a fascicles setup in geometry nodes. A mesh curve becomes the stem's body, likely invisible, and the fascicles generate and twist around it. There is potential to have that effect drive morph targets on the character. World position offset might also work, though I know less about it at the point of converting to Unreal.</p>
+    <p>The bundle and twist is literal with the knots here. The radius stays the same at the base, with room to expand it later.</p>
+    <figure>
+      <img src="images/journal/sep-04.jpg" alt="Contact sheet of around forty small grey renders showing the stem coiling through its range" loading="lazy">
+      <figcaption>Coil range, frame by frame</figcaption>
+    </figure>
   </article>
 
-  <article class="entry read">
+  <article class="entry read" id="sep-16">
+    <p class="date">16 September</p>
+    <h3>Planning eye states</h3>
+    <figure>
+      <img src="images/journal/sep-05.jpg" alt="Storyboard grid of eight annotated sketches showing weed and eye states from coiled and stressed through to open and uncoiled" loading="lazy">
+      <figcaption>Eye and body states, with the annotations they were planned from</figcaption>
+    </figure>
+    <p>The eye is becoming a bigger feature. Two-way blends on a Look At node made some interesting shapes, but a clean profile curve is more striking. Right now it snakes around every axis, which distorts the top-heavy shoulder curl that gives the thing character without being a direct human representation.</p>
+  </article>
+
+  <article class="entry read" id="sep-28">
     <p class="date">28 September</p>
-    <h3>The eye becomes the feature</h3>
-    <p>Got the new geometry-node mesh looking at the cursor, standing in for the viewer's head. Using absolute world space on Z is a highly effective hazy void, and I am moving toward lit shaders since pure emissive is a bit too formless at this stage.</p>
-    <p>Two-way blends on a look-at node made some interesting shapes, but a clean profile curve is more striking. Right now it snakes around every axis, which distorts the top-heavy shoulder curl that gives the thing character without being a direct human representation.</p>
-    <div class="plate">
-      <img src="images/journal/image-21.png" alt="Geometry node mesh" loading="lazy">
-      <img src="images/journal/image-22.png" alt="World space Z shading" loading="lazy">
-      <img src="images/journal/image-23.png" alt="Look at test" loading="lazy">
-    </div>
-    <p>Added a taper driven by a profile curve, which reads as a more interesting shape and also as more open and receptive. When open, the tendrils almost look like a hand opening, or exposing an inside.</p>
-    <p>So far I have been happy with how quick the testing and prototyping has been. In the past I would have jumped straight to rigging a character flower. Quick iterative procedural tests are a better way to find the balance of control between the two.</p>
-    <div class="plate">
-      <img src="images/journal/image-24.png" alt="Tapered form" loading="lazy">
-      <img src="images/journal/image-25.png" alt="Open tendrils" loading="lazy">
-      <img src="images/journal/image-26.png" alt="Flat colour test" loading="lazy">
-    </div>
-  </article>
-
-  <article class="entry read">
-    <p class="date">September</p>
-    <h3>Interaction states, first pass</h3>
-    <p>Rendering a preview animation for feedback. The interaction as I have it so far:</p>
+    <h3>Character profiles</h3>
+    <figure>
+      <img src="images/journal/sep-06.jpg" alt="Blender viewport showing the gold coiled creature with its geometry node graph beneath" loading="lazy">
+    </figure>
+    <p>Adding a taper driven by a profile curve. It reads as a more interesting shape, and as more open and receptive. A stretch goal is to use Unreal's Niagara system to span extra meshes across the body. The shapes are good: when open, the tendrils almost look like a hand opening, or exposing an inside.</p>
+    <p>Most of my past animation experience was in Maya, and mostly simple work. Exploring Blender has been genuinely interesting in this regard, using actions, the dope sheet and the animation graphs with more purpose.</p>
+    <p>Rendering out a preview animation to share for feedback. With the weeks flying by, the scope is settling on two things:</p>
     <ul>
-      <li><strong>Idle</strong> — coiled, tense and wary. Observers detected.</li>
-      <li><strong>Curious</strong> — unfurls to 50% when a skeleton is detected. Tracks orientation with look-at nodes. Bone rotation dampens when curled, but the eye is independent and always tracks.</li>
-      <li><strong>Movement</strong> — flashes like a snapshot, saturation driven by velocity.</li>
-      <li><strong>Dance</strong> — unfurls from 50 to 100% under a lot of motion.</li>
+      <li>Furl and unfurl based on presence, multiplied by motion.</li>
+      <li>Visuals still undecided. I like the flat look but have not explored custom GLSL or HLSL shaders. For now I like the flat saturated colour and the shared shader logic of world Z or height, going to a flat dark purple with possible hints of luminescent grass tips. I have a past animation of flat colours against a silhouette that could be striking and simple.</li>
     </ul>
-    <p>It always seeks to return to a 25 or 50% baseline. I am concerned this is already too many layers and risks overcomplicating what should be tense and alone moving to relaxed and free.</p>
-    <div class="plate">
-      <img src="images/journal/image-27.png" alt="Preview animation frame" loading="lazy">
-      <img src="images/journal/image-28.png" alt="Preview animation frame" loading="lazy">
-    </div>
+    <figure>
+      <img src="images/journal/sep-07.jpg" alt="Blender viewport with the creature uncoiled and a white eye visible at the head" loading="lazy">
+    </figure>
   </article>
 
   <!-- ================= OCTOBER ================= -->
-  <div class="month"><h2>October</h2><span>Interaction, build and exhibition</span></div>
+  <div class="month" id="october"><h2>October</h2><span>Interaction, build and exhibition</span></div>
 
-  <article class="entry read">
-    <p class="date">1 October</p>
-    <h3>Rebinding the eye</h3>
-    <p>Rebound the eye socket to the correct mesh. Vertex weight paint is still offset. Onto the next phase: getting the interaction working out of TouchDesigner.</p>
-    <figure><img src="images/journal/image-29.png" alt="Eye socket rebind" loading="lazy"></figure>
+  <article class="entry read" id="oct-05">
+    <p class="date">5 October</p>
+    <h3>Geo Nodes, Unreal, TouchDesigner</h3>
+    <figure>
+      <img src="images/journal/oct-01.jpg" alt="Webcam feed of a person with pose landmarks overlaid, beside the TouchDesigner network reading it" loading="lazy">
+      <figcaption>MediaPipe reading a live feed</figcaption>
+    </figure>
+    <p>This will be a good point to test with the cohort and with friends and family. The next phase is refining the data coming out of TouchDesigner.</p>
+    <p>I had been testing with a pre-recorded video stream decoded by MediaPipe, to confirm the movement actually reaches Unreal. The data dictates how reliably the interaction can be tested, so it needs more attention than I first gave it.</p>
+    <p>MediaPipe takes a webcam as its feed, and a live camera with real movement is better than a recording. OBS Studio can make a virtual camera from a looped file for the cases where I need something repeatable.</p>
+    <figure>
+      <img src="images/journal/oct-02.jpg" alt="TouchDesigner network of green operator nodes routing MediaPipe channels into a merge" loading="lazy">
+      <figcaption>MediaPipe container, averaging the ear channels</figcaption>
+    </figure>
+    <p>In the MediaPipe container, selecting and averaging the ears across X and Y on all four channels works better than the alternatives. MediaPipe also outputs a visibility channel for the ears, which makes presence easier to detect than I expected.</p>
+    <figure>
+      <img src="images/journal/oct-03.jpg" alt="Plate of deformation tests: line studies of coiled forms, a gold curve on red, and a tendril on teal" loading="lazy">
+      <figcaption>Testing methods of deformation</figcaption>
+    </figure>
+    <p>Currently a back and forth over how far a bone can coil in Blender. I wrote a script that creates the skeleton uniformly along a spline. I had been building the chain as a straight vertical and then posing it, but that is not needed here.</p>
+    <p>The curve has an interesting character to it. A bit like a warbled question mark.</p>
+    <p>A world position offset shader has been harder to get right than I thought. Presence and detection feel good, and I am leaning away from making a direct character. It is an assumption, but a character or a puppet tells you what it is, and that leaves less room for curiosity.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">6 October</p>
-    <h3>TouchDesigner to Unreal</h3>
-    <p>Three outputs from TouchDesigner on port 10000, sending normalised screen coordinates, since I already have the systems built around the deprojected plane intersection.</p>
-    <pre>/head_tx   0..1   head centre, horizontal
-/head_ty   0..1   head centre, vertical
-/presence  0|1    is anyone there</pre>
-    <p>MediaPipe takes a webcam feed, and a live camera is better than prerecorded video for testing. OBS Studio makes a virtual camera from a looped file for when I need something repeatable. Selecting and averaging the ears across X and Y on all four channels works better than the alternatives here, and MediaPipe's visibility channel on the ears makes presence easier to detect than I expected.</p>
-    <div class="plate">
-      <img src="images/journal/image-30.png" alt="TouchDesigner network" loading="lazy">
-      <img src="images/journal/image-32.png" alt="MediaPipe container" loading="lazy">
-      <img src="images/journal/image-33.png" alt="OSC outputs" loading="lazy">
-    </div>
-  </article>
-
-  <article class="entry read">
-    <p class="date">13 October</p>
-    <h3>Back into it</h3>
-    <p>Coming back to the project after a while is discombobulating. Good to do some motion work on Metamorphosis to get moving again.</p>
-  </article>
-
-  <article class="entry read">
+  <article class="entry read" id="oct-14">
     <p class="date">14 October</p>
-    <h3>Didactics, and moving to the shoulders</h3>
-    <p>Working on the didactic. Exploring the idea of the shared energy required to make an interactive exhibit whole: someone interacting with the exhibit is more or less what the exhibition is. The pressure to perform is shared by the weed.</p>
-    <figure><img src="images/journal/image-34.png" alt="Didactic working notes" loading="lazy"></figure>
-    <p>Changed the uncoiling driver from head to <strong>shoulders</strong>. Much easier to measure the distance between those two points than the head, which can turn.</p>
+    <h3>Touch measurements</h3>
+    <figure>
+      <img src="images/journal/oct-04.jpg" alt="Two TouchDesigner panels showing shoulder-width measurement between tracked points" loading="lazy">
+    </figure>
+    <p>Exploring the idea of the shared energy needed to make an interactive exhibit whole. Someone interacting with the exhibit is more or less what the exhibition is. The pressure to perform is shared by the weed, which oscillates between a subdued, guarded state and an open one depending on what it is given.</p>
+    <p>Changing from head to <strong>shoulders</strong> for the uncoiling. Much easier to measure the distance between those two points than the head, which can turn.</p>
     <pre>Select (left_shoulder:x, right_shoulder:x)
   &rarr; Math CHOP: Subtract, then Absolute Value
   &rarr; Filter 0.1s
   &rarr; Rename "proximity"
   &rarr; into the existing Merge</pre>
-    <p>After talking the project through and thinking harder about expected behaviour from a participant, coil and uncoil will not be driven by movement alone. Presence can still uncoil the weed.</p>
-    <div class="plate">
-      <img src="images/journal/image-35.png" alt="Shoulder distance setup" loading="lazy">
-      <img src="images/journal/image-36.png" alt="Measuring shoulder points" loading="lazy">
-      <img src="images/journal/image-37.png" alt="Proximity calibration" loading="lazy">
-    </div>
-    <p>Proximity needs proper calibration, ideally with numbers I can change on the fly. The part that can only be done once, properly, in the actual room: stand where the furthest viewer will realistically be and note the value, then stand at the closest point that should count as fully engaged and note that.</p>
+    <p>After discussing the project and thinking harder about expected behaviour from a participant, the coil and uncoil will not be driven by movement alone. Presence can still uncoil the weed.</p>
+    <figure>
+      <img src="images/journal/oct-05.jpg" alt="Unreal Blueprint graph with a Switch on String node routing the incoming OSC addresses" loading="lazy">
+    </figure>
+    <p>Using Switch on String, I can filter out <code>/head_tx</code>, <code>/head_ty</code> and the rest, then set a variable of the same name. Presence arrives as something like 0.5336666, so bands of values between 0 and 1 can drive different parts of the animation and the scene.</p>
+    <p>Proximity needs proper calibration, ideally with the ability to change the numbers on the fly. That is the part that can only be done once, properly, in the actual room: stand where the furthest viewer will realistically be and note the value, then stand at the closest point that should count as fully engaged and note that.</p>
+    <figure>
+      <img src="images/journal/oct-06.jpg" alt="Wide Unreal Blueprint graph of the value filtering chain" loading="lazy">
+    </figure>
+    <p>Dialling in the interaction by clamping the spine so it moves predictably while keeping a distinct silhouette.</p>
+    <p>It is nice and simple as it stands, and I would like to explore other aspects of the interaction, particularly dynamic sound. The initial idea is sonification built from recordings of my backyard, with more ambient creature noises for the relaxed state, and loose against tight wire strums for the rest.</p>
+    <figure>
+      <img src="images/journal/oct-07.jpg" alt="Unreal animation Blueprint with a large commented region driving the coil" loading="lazy">
+    </figure>
+    <p>Shoulder width controls the coiling, open or engaged based on an estimate of body position. Pluck uses vertex world position offset linked to the wrists. I was wary of adding another form of interaction for a number of reasons, but it turned out to be the natural progression and was surprisingly fast to retool, since most of the logic already existed.</p>
+    <p>Having watched people use it, I am reluctant to add more variables, but the neon green pluck band needs separating from delta time so it responds to raw movement instead. Right now it fires more or less constantly, which drains it of meaning.</p>
+    <p>Added head tilt after thinking about the scene as a whole, so the creature reads as attending to someone rather than merely facing them.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">October</p>
-    <h3>Pluck</h3>
-    <p>Wrist positions now drive a pluck on the arm. Routing TouchDesigner to OSC into Unreal through a switch on the string is a much more elegant way to test several interaction types in quick order.</p>
-    <div class="plate">
-      <img src="images/journal/image-38.png" alt="OSC switch setup" loading="lazy">
-      <img src="images/journal/image-39.png" alt="Pluck test" loading="lazy">
-    </div>
-    <p>Three channels now sit together cleanly. Shoulder width controls coiling. The spine is clamped so it moves predictably while keeping a distinct silhouette. Pluck uses vertex world position offset linked to the wrists. I was wary of adding another form of interaction at this point, but it turned out to be the natural progression and surprisingly fast to retool given most of the logic already existed.</p>
-    <p>Calling the character <strong>Fiddlearm</strong>, which has a nice ring to it.</p>
-    <p>Rather than complicating the interaction further there is a nice simplicity to it. It would benefit from art passes and shader work, but I would rather spend the remaining time on other aspects of interaction, particularly sound.</p>
+  <article class="entry read" id="oct-18">
+    <p class="date">18 October</p>
+    <h3>Mote field</h3>
+    <figure>
+      <img src="images/journal/oct-08.jpg" alt="Night scene with a pale moon and the creature's strands lit against deep blue, beside its Blueprint panel" loading="lazy">
+    </figure>
+    <figure>
+      <img src="images/journal/oct-09.jpg" alt="Debug view: a white capsule and wireframe sphere marking tracked hand positions among floating motes" loading="lazy">
+      <figcaption>Hand repellers, shown as debug spheres</figcaption>
+    </figure>
+    <p>The mote field was far harder to set up and debug than I anticipated, given I could already track hands reliably with the debug sphere. It meant tightening the particle spawn bounds and revisiting the deprojected plane, visible above as the debug sphere.</p>
+    <p>The Blueprint looks complicated, but the system is really just filtering these values. Wrist movement still needs separating for the mote field, though with time running out I moved that to a nice-to-have.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">October</p>
-    <h3>Sound, in theory</h3>
-    <p>I keep coming back to this. At one point Fiddlearm was almost an instrument you could play through the strums on tense and loose strings. Now I think it is closer to an alert ambience, the kind that exists on dusk or when the night is young and everything is in transit.</p>
-    <p>With no user detected, or someone turned away, the sound is the gallery ambience itself. On showcase night that will be loud, but more often it is HVAC and projectors. Low reverb strums as it opens, twangier noises when tense, city honks and aeroplanes under apprehension, tranquil night sounds when open. The piece exists visually with nobody there, but it does not really appear until someone is present, and the audio should follow the same rule, affecting not just the weed but the world it sits in.</p>
+  <article class="entry read" id="oct-22">
+    <p class="date">22 October</p>
+    <h3>The whole chain</h3>
+    <figure>
+      <img src="images/journal/oct-10.jpg" alt="Diagram of the Fiddlearm signal chain from webcam through TouchDesigner and OSC into Unreal, ending in spine coil, pluck, mote field and eye" loading="lazy">
+      <figcaption>Every arrow is one number per frame</figcaption>
+    </figure>
+    <p>Drawn out, the system is much smaller than the Blueprint suggests. Three numbers cross from TouchDesigner into Unreal and everything else is derived from them. Shoulder width replaced head tracking because the head turns and the shoulders do not. Movement is read as speed rather than position, so the plant answers to how you move instead of where you are.</p>
   </article>
 
-  <article class="entry read">
-    <p class="date">October</p>
-    <h3>Testing on family</h3>
-    <p>Most of the testing has been with cohort and family. People are far more likely to interact with it than I thought, though they often try sudden movements rather than exploring body position, and they do tend to turn to face the camera.</p>
-    <p>My wife wanted it to track her movements and almost became self-conscious when it did not. An impromptu test with my daughter, who still does not like the interaction, did reveal that shoulder width for small children is a problem.</p>
-    <p>The green pluck is currently firing constantly. It needs separating from delta time and responding to raw movement instead.</p>
-    <figure><img src="images/journal/image-40.png" alt="Pluck band firing" loading="lazy"></figure>
-  </article>
+  <!-- ================= CONCLUSION ================= -->
+  <div class="close" id="close">
+    <article class="entry read">
+      <p class="date">24 October &middot; after</p>
+      <h3>What happened in the room</h3>
+      <p>It worked. Friends, family and cohort rather than industry, but it worked. Fiddlearm opened for people who found the sweet spot, and others noticed from across the room that it was behaving differently for them than it had a moment earlier. That recognition, one person seeing another person's version of it, was the honeypot effect doing exactly what I had designed for.</p>
+      <p>I never got to fine-tune the calibration in the actual room. Flooding took that window away, and it showed. The band between nothing and fully open was narrower than it should have been, so the piece spent most of the night in the middle of its range rather than using the ends.</p>
+      <p>One person moved in large gestural ways. Only one. It was rare enough that I immediately wanted to give them a bigger payoff than I had built, and that gap is the clearest single lesson from the night. The rare engagement is the thing worth designing for, and I had under-rewarded it.</p>
 
-  <article class="entry read">
-    <p class="date">October</p>
-    <h3>Motes, and getting hands into the scene</h3>
-    <p>A component missing from the scene is a way for the viewer's raw interaction to appear without overpowering what is already there. Tracking hand positions and having them push soft motes around could orient the user and give a sense of being a force within the scene rather than only being seen by it.</p>
-    <div class="plate">
-      <img src="images/journal/image-41.png" alt="Scene study" loading="lazy">
-      <img src="images/journal/image-42.png" alt="Mote field concept" loading="lazy">
-    </div>
-    <p>Risky to add this many new elements at this stage, so I took a restore point with working TouchDesigner and Unreal packages first.</p>
-    <p>Hands were harder than expected. The mote field attracts or repels from the deprojected position, but driving it from visibility alone caused odd gating. Moved the particles back to 100 and matched the deprojection to the same location. Wrist movement currently fires strength on both wrists, which would mean separating them in TouchDesigner, but the particles are reacting.</p>
-    <div class="plate">
-      <img src="images/journal/image-43.png" alt="Mote field in engine" loading="lazy">
-      <img src="images/journal/image-44.png" alt="Hand repellers" loading="lazy">
-      <img src="images/journal/image-45.png" alt="Mote field tuning" loading="lazy">
-    </div>
-    <p>It added real time at a critical point, but having arms in the scene is a much more natural way to get granular feedback without overpowering anything. Eventually both wrists should be driven by their own movement and velocity, and the wrists should carry an alpha, possibly the eye itself acting as a fake light.</p>
-  </article>
+      <h3 style="margin-top:34px">What I would change</h3>
+      <p><strong>Sound.</strong> It stayed on the list all semester and never got built. Even subtle audio would have cut through a noisy gallery, and it was the cheapest payoff available to me.</p>
+      <p><strong>A bigger ceiling.</strong> The screen-buffer pulse, or a large background colour shift, would have given that one gestural visitor something that matched what they put in.</p>
+      <p><strong>Head volume as the repeller.</strong> Very few people raised their hands, so the mote field rarely fired. Driving it from the head instead would have meant everyone saw it, and it would have made the head tracking legible at the same time, which was its own unsolved problem.</p>
+      <p><strong>A light on the motes.</strong> An alpha light travelling with the particles would have made the interaction visible rather than merely present.</p>
 
-  <article class="entry read">
-    <p class="date">24 October</p>
-    <h3>Exhibition</h3>
-    <p>It worked out well. Friends and family, not really any industry people, but it was good. Watching people with the interaction was interesting. I failed to fine-tune the calibration in the room, flooding prevented that honestly, but it still worked in the sense that Fiddlearm opened for people who found the sweet spot, and others noticed from across the room that it was behaving differently for them.</p>
-    <p>I only really saw one person moving and interacting in large gestural ways, which was rare enough that I wanted to give them a bigger payoff. Audio would have helped, and even subtle audio would cut through a noisy gallery. That was the moment I regretted not having the screen-buffer pulse or large background colour changes, which would have been very eye-catching there.</p>
-    <p>Very few people raised their hands at all, which was fine, but it would have benefited from the head volume acting as the particle repeller. That might also have solved the head tracking, with people realising it tracks the head. An alpha light on the particles so it appeared to be highlighting them, plus a synapse burn on the background frame buffer, would have made a much stronger piece for anyone who did perform strongly.</p>
-    <p>The rarity of going beyond 0 to 1 can definitely be strengthened, but it was still fun, and it brought a lot of joy to watch people engage. Recognising the disappointment when they did not is part of what makes the rarer engagements feel unique.</p>
-    <p>Another point of pride, or at least sticking to my guns, is that the observed testing did not rely on a biped character. If you were a weed dancing in a T-pose, that would have been far simpler for a technical showcase. Would it have sparked more joy? I resisted it because a more amorphous creature does not immediately tell you what you <em>should</em> do. Copy human-centric features and it becomes a less intentional experience.</p>
-    <p>It would be interesting to see this on a much grander version. Four walls.</p>
-    <figure><img src="images/journal/image-46.png" alt="Fiddlearm at the UniSC Art Gallery" loading="lazy"></figure>
-  </article>
+      <h3 style="margin-top:34px">What I would keep</h3>
+      <p>Not using a biped. A dancing figure in a T-pose would have been simpler to build and would have read instantly, and that is exactly the problem. A recognisably human form tells you what you are supposed to do with it. An amorphous one does not, and the not-knowing is the work. People experimented because there was nothing obvious to copy.</p>
+      <p>The jank, too. The calibration is imperfect, it closes when you do not expect it, and it does not always answer the way you think it should. That resistance is why people stayed with it rather than solving it in four seconds and walking off. There is no correct input, and the piece is better for refusing to pretend otherwise.</p>
 
-  <article class="entry read">
-    <p class="date">October</p>
-    <h3>Fiddlearm on the web</h3>
-    <p>An interesting blend: a rendered loop with the live interaction limited to the eye. A low-cost way to recreate Fiddlearm in a form that works in a browser, which is now the hero of this site.</p>
-  </article>
+      <h3 style="margin-top:34px">Where it goes</h3>
+      <p>The obvious next version is scale. Four walls rather than one monitor, the way Hello Stranger ran, where the thing is around you rather than in front of you. The interaction logic would survive the move largely unchanged, since it only passes three numbers.</p>
+      <p>The less obvious one already exists. Fiddlearm is rebuilt on my own site as a rendered loop with the eye driven live, which is a cheap way to carry the idea into a browser where the real sensing cannot go. It is not the piece, but it holds the part that matters, which is something that notices you are there.</p>
+      <p>What the project turned out to be about is not the plant. It is the effort of staying open and curious with something that does not immediately reward you, rather than closing up and moving on. Watching people find that, and watching others not find it, was the most useful thing I did all semester.</p>
+    </article>
+  </div>
 
   <footer>
-    <a href="index.html">Back to work</a>
-    <a href="mailto:mjbissell@gmail.com">mjbissell@gmail.com</a>
-    <span>DES309 &middot; UniSC &middot; 2026</span>
+    <span class="who">Matty Bissell</span>
+    <span>Design, interaction, and small moments of wonder.</span>
+    <span class="spacer"></span>
+    <a href="https://www.linkedin.com/in/matthew-bissell-9010507/" target="_blank" rel="noopener">Find me on LinkedIn &#8599;</a>
+    <a href="#top">Back to top &#8593;</a>
   </footer>
+  <p style="max-width:1180px;margin:14px auto 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.14em;color:#7d7a85">DES309 &middot; 2026</p>
 
 </div>
