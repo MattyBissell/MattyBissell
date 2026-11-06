@@ -70,23 +70,33 @@ h1{
 /* ---------- contents ---------- */
 .toc{
   margin-top:44px;border-top:1px solid var(--line);padding-top:20px;
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:30px 34px;
 }
 .toc h2{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--leaf);margin:0 0 10px;font-weight:400;
+  text-transform:uppercase;color:var(--muted);margin:0;font-weight:400;
   grid-column:1 / -1;
 }
+.toc .col{min-width:0}
 .toc ol{list-style:none;margin:0;padding:0}
-.toc li{margin-bottom:5px}
+
 .toc .mo{
-  display:block;font-family:var(--font-display);font-size:21px;
-  color:var(--cream);text-decoration:none;margin-bottom:8px;letter-spacing:.01em;
+  display:block;font-family:var(--font-display);font-size:22px;
+  color:var(--cream);text-decoration:none;letter-spacing:.01em;
+  margin-bottom:10px;
 }
-.toc .mo:hover{color:var(--leaf)}
-.toc a{color:var(--cream-dim);text-decoration:none;font-size:13.5px}
-.toc a:hover{color:var(--leaf)}
-.toc .d{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-right:7px}
+.toc .mo:hover{text-decoration:underline;text-underline-offset:4px}
+
+.toc li a{
+  display:flex;align-items:baseline;gap:11px;padding:4px 0;
+  color:var(--cream-dim);text-decoration:none;font-size:13.5px;line-height:1.4;
+}
+.toc li a:hover{text-decoration:underline;text-underline-offset:3px}
+.toc li a:focus-visible{outline:2px solid var(--leaf);outline-offset:2px}
+.toc .d{
+  font-family:var(--font-mono);font-size:11px;color:var(--muted);
+  flex:0 0 auto;font-variant-numeric:tabular-nums;
+}
 
 /* ---------- months ---------- */
 .month{
@@ -138,6 +148,33 @@ pre{
 .cite{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:52ch;margin:0 0 14px}
 .cite a{color:var(--muted);text-decoration-color:var(--line)}
 
+/* ---------- AI disclosure ---------- */
+details.ai{
+  border:1px solid var(--line);background:#0d0d10;
+  margin:0 0 16px;max-width:860px;
+}
+details.ai summary{
+  cursor:pointer;list-style:none;padding:12px 16px;
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--leaf);
+  display:flex;align-items:center;gap:10px;
+}
+details.ai summary::-webkit-details-marker{display:none}
+details.ai summary::before{content:"+";font-size:14px;line-height:1;width:10px}
+details.ai[open] summary::before{content:"\2212"}
+details.ai summary:focus-visible{outline:2px solid var(--leaf);outline-offset:-2px}
+details.ai .body{padding:0 16px 16px;border-top:1px solid var(--line);padding-top:14px}
+details.ai .lbl{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 8px;
+}
+details.ai blockquote{
+  margin:0 0 18px;padding:0 0 0 14px;border-left:2px solid var(--leaf);
+  color:var(--cream-dim);font-size:14px;line-height:1.6;
+}
+details.ai pre{margin:0 0 18px;max-width:none}
+details.ai .after{margin:0;font-size:13.5px;line-height:1.6;color:var(--cream-dim)}
+
 /* ---------- conclusion ---------- */
 .close{margin-top:60px;padding-top:14px;border-top:var(--stroke) solid var(--cream)}
 .close .entry{border-bottom:0}
@@ -181,35 +218,43 @@ footer a:hover{color:var(--leaf)}
   <!-- ================= CONTENTS ================= -->
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
-    <ol>
+    <div class="col">
       <a class="mo" href="#august">August</a>
-      <li><a href="#aug-05"><span class="d">05</span>Where I sit in design</a></li>
-      <li><a href="#aug-11"><span class="d">11</span>Prototypes</a></li>
-      <li><a href="#aug-19"><span class="d">19</span>Finding the thread</a></li>
-      <li><a href="#aug-23"><span class="d">23</span>Fixed digital twin</a></li>
-      <li><a href="#aug-29"><span class="d">29</span>Defining the interaction</a></li>
-    </ol>
-    <ol>
+      <ol>
+        <li><a href="#aug-05"><span class="d">05</span>Where I sit in design</a></li>
+        <li><a href="#aug-11"><span class="d">11</span>Prototypes</a></li>
+        <li><a href="#aug-19"><span class="d">19</span>Finding the thread</a></li>
+        <li><a href="#aug-23"><span class="d">23</span>Fixed digital twin</a></li>
+        <li><a href="#aug-29"><span class="d">29</span>Defining the interaction</a></li>
+      </ol>
+    </div>
+    <div class="col">
       <a class="mo" href="#september">September</a>
-      <li><a href="#sep-05"><span class="d">05</span>Nodes</a></li>
-      <li><a href="#sep-12"><span class="d">12</span>Expected response in the gallery</a></li>
-      <li><a href="#sep-14"><span class="d">14</span>Feedback</a></li>
-      <li><a href="#sep-16"><span class="d">16</span>Planning eye states</a></li>
-      <li><a href="#sep-28"><span class="d">28</span>Character profiles</a></li>
-    </ol>
-    <ol>
+      <ol>
+        <li><a href="#sep-05"><span class="d">05</span>Nodes</a></li>
+        <li><a href="#sep-12"><span class="d">12</span>Expected response in the gallery</a></li>
+        <li><a href="#sep-14"><span class="d">14</span>Feedback</a></li>
+        <li><a href="#sep-16"><span class="d">16</span>Planning eye states</a></li>
+        <li><a href="#sep-28"><span class="d">28</span>Character profiles</a></li>
+      </ol>
+    </div>
+    <div class="col">
       <a class="mo" href="#october">October</a>
-      <li><a href="#oct-05"><span class="d">05</span>Geo Nodes, Unreal, TouchDesigner</a></li>
-      <li><a href="#oct-14"><span class="d">14</span>Touch measurements</a></li>
-      <li><a href="#oct-18"><span class="d">18</span>Mote field</a></li>
-      <li><a href="#oct-22"><span class="d">22</span>The whole chain</a></li>
-    </ol>
-    <ol>
+      <ol>
+        <li><a href="#oct-05"><span class="d">05</span>Geo Nodes, Unreal, TouchDesigner</a></li>
+        <li><a href="#oct-14"><span class="d">14</span>Touch measurements</a></li>
+        <li><a href="#oct-18"><span class="d">18</span>Mote field</a></li>
+        <li><a href="#oct-22"><span class="d">22</span>The whole chain</a></li>
+      </ol>
+    </div>
+    <div class="col">
       <a class="mo" href="#close">After</a>
-      <li><a href="#close"><span class="d">24</span>The exhibition</a></li>
-      <li><a href="#close">What I would change</a></li>
-      <li><a href="#close">Where it goes</a></li>
-    </ol>
+      <ol>
+        <li><a href="#close"><span class="d">24</span>The exhibition</a></li>
+        <li><a href="#close"><span class="d">&middot;</span>What I would change</a></li>
+        <li><a href="#close"><span class="d">&middot;</span>Where it goes</a></li>
+      </ol>
+    </div>
   </nav>
 
   <!-- ================= AUGUST ================= -->
@@ -221,8 +266,8 @@ footer a:hover{color:var(--leaf)}
     <p>Much of the early thinking revolved around my place in the world of design. What job am I aiming for, and what kind of energy do I want to put out into the world? Starting a Figma and a PureRef board helped get the ideas moving.</p>
     <p>Running alongside the capstone, as a transition to industry, I have also been working on my own personal branding. As with all creative work, the two bleed into each other.</p>
     <div class="plate">
-      <img src="images/journal/aug-01.jpg" alt="Still from Phoebe Paradise's Procreate Dreams animation: a glowing figure against a sunset gradient" loading="lazy">
-      <img src="images/journal/aug-02.jpg" alt="Two early Unreal tests side by side, labelled Simple IK Chain and weird weed, and Bug Legs wiggle and spider shadows" loading="lazy">
+      <img src="images/journal/image%201.png" alt="Still from Phoebe Paradise's Procreate Dreams animation: a glowing figure against a sunset gradient" loading="lazy">
+      <img src="images/journal/image%202.png" alt="Two early Unreal tests side by side, labelled Simple IK Chain and weird weed, and Bug Legs wiggle and spider shadows" loading="lazy">
     </div>
     <p class="cite">Paradise, P. [@phoebe.paradise]. (2026, May 19). <em>Finally got around to experimenting with the amazing Procreate Dreams while recovering from surgery and the more I worked</em> [Video]. Instagram. <a href="https://www.instagram.com/reel/DYhFF6eTtkb/" target="_blank" rel="noopener">instagram.com/reel/DYhFF6eTtkb</a></p>
     <p>A few early ideas came out of <strong>Hello Stranger</strong>. That supermarket project has an interesting interactive stack: TouchDesigner and MediaPipe piped into Unreal over an OSC server, so the geometry, particles, lighting, materials and Blueprint logic can all be driven by outputs derived from a plain video feed. It is a fairly unusual way to build an environment.</p>
@@ -235,12 +280,12 @@ footer a:hover{color:var(--leaf)}
     <p>Getting the project running end to end is the biggest priority, so I can test both the functionality and the concept with people.</p>
     <p>That meant a simple four-bone chain skinned to an object, mapped to mouse movement for now.</p>
     <figure>
-      <img src="images/journal/aug-03.jpg" alt="Four-panel Blender to Unreal test: a bent bone chain, a sphere with a bone, and two node graphs" loading="lazy">
+      <img src="images/journal/image%205.png" alt="Four-panel Blender to Unreal test: a bent bone chain, a sphere with a bone, and two node graphs" loading="lazy">
       <figcaption>Blender to Unreal, first pass</figcaption>
     </figure>
     <p>Had the usual trouble with scale and export settings, so smoothing those workflows out early is always worth it. Creating the Blueprint and the skeletal mesh is straightforward enough. Transforming and rotating bones can be driven by different values down the chain, and here I am multiplying the bend factor by increments.</p>
     <figure>
-      <img src="images/journal/aug-04.jpg" alt="Colour studies: a figure silhouetted against a flat red field, and the same shape against pink and blue" loading="lazy">
+      <img src="images/journal/image%205-1.png" alt="Colour studies: a figure silhouetted against a flat red field, and the same shape against pink and blue" loading="lazy">
       <figcaption>Vivid values against shadow</figcaption>
     </figure>
     <p>On theme, the early visual tests have been looking at vivid values against shadow, used to good effect in Disney's <em>Fantasia</em>.</p>
@@ -250,8 +295,8 @@ footer a:hover{color:var(--leaf)}
     <p class="date">19 August</p>
     <h3>Finding the thread</h3>
     <div class="plate">
-      <img src="images/journal/aug-05.jpg" alt="Dark scene with a glowing plant form and a thin green ground line, labelled Style Exploration" loading="lazy">
-      <img src="images/journal/aug-06.jpg" alt="Reference board: a green spiral shader and a black and white stippled illustration" loading="lazy">
+      <img src="images/journal/image%204.png" alt="Dark scene with a glowing plant form and a thin green ground line, labelled Style Exploration" loading="lazy">
+      <img src="images/journal/image%207.png" alt="Reference board: a green spiral shader and a black and white stippled illustration" loading="lazy">
     </div>
     <p>Thinking about a more abstract way to present the scene and the object. A scribbly doodled style feels appropriate and a bit nostalgic. That kind of rendering could be faked with spline geometry and ribbon particles, though a custom HLSL shader is also an option for cross-hatching.</p>
     <p>The second image is Spirals on Spirals, which throws out an interesting outward pattern. The high fluorescent blues, whites and greens could work as a dopamine pulse of happiness, going grey when still. The stippling reminds me of the cover of Shaun Tan's <em>The Night</em>, and it raises the idea of rendering the scene in a similar way: a hatch shader, or simple white on edge detection, possibly with a flipped and offset geometry trick.</p>
@@ -262,18 +307,18 @@ footer a:hover{color:var(--leaf)}
     <h3>Fixed digital twin</h3>
     <p>Taking inspiration from Universal Everything's Digital Twin campaign. I liked the idea of raycasting, which is expensive, or a particle explosion on an observed skeleton. A lot of what makes that campaign work is the simulated weight and bounce.</p>
     <figure>
-      <img src="images/journal/aug-07.jpg" alt="Grid of six sketches of plant figures, each paired with a small human silhouette for scale" loading="lazy">
+      <img src="images/journal/image%208.png" alt="Grid of six sketches of plant figures, each paired with a small human silhouette for scale" loading="lazy">
       <figcaption>Backyard plants as eclectic foliage figures</figcaption>
     </figure>
     <p>Sketching plants and weeds from my backyard as eclectic foliage figures. They could expand, grow and contract depending on how much movement or energy a user gives them. A generated surface populated with smaller plants, sudden blooms, tight spatial arrangements like phyllotaxis. If movement is slow, it leans toward broms, staghorn, old man's whiskers, trees.</p>
     <p>Could be asset intensive.</p>
     <figure>
-      <img src="images/journal/aug-08.jpg" alt="Four Blender renders of a pink bloom with an eye at its centre, each a different density" loading="lazy">
+      <img src="images/journal/image%209.png" alt="Four Blender renders of a pink bloom with an eye at its centre, each a different density" loading="lazy">
       <figcaption>Previz of a plant head</figcaption>
     </figure>
     <p>Previz of a plant head in Blender. It should be possible to get a head bone and orientation from the distance between the ears, with nose tilt controlling different spheres of scattered sprite geometry.</p>
     <figure>
-      <img src="images/journal/aug-09.jpg" alt="A red coiled spiral in the Blender viewport beside its geometry node graph" loading="lazy">
+      <img src="images/journal/image%2020.png" alt="A red coiled spiral in the Blender viewport beside its geometry node graph" loading="lazy">
       <figcaption>Geometry nodes along a spline</figcaption>
     </figure>
     <p>Testing geometry nodes along a spline. Exploring coiling and uncoiling, and collapsing the geometry node setup into two states with morph targets blending between them.</p>
@@ -284,11 +329,11 @@ footer a:hover{color:var(--leaf)}
     <h3>Defining the interaction</h3>
     <p>After trying to talk the interaction through with peers in a tutorial, I found I could not explain it easily. That is a good sign that I need to think the whole thing through end to end rather than fixating on the visual language.</p>
     <figure>
-      <img src="images/journal/aug-10.jpg" alt="Two renders: a coiled gold form on a dark blue ground, and a black silhouette against pink" loading="lazy">
+      <img src="images/journal/image%2016.png" alt="Two renders: a coiled gold form on a dark blue ground, and a black silhouette against pink" loading="lazy">
     </figure>
     <p>This was always partly a test of whether I could drive morph targets and bones from Unreal. The early version ran on deprojected mouse movement.</p>
     <figure>
-      <img src="images/journal/aug-11.jpg" alt="Ideation board of colour studies, line drawings and interface screenshots arranged in a flow" loading="lazy">
+      <img src="images/journal/image%203.png" alt="Ideation board of colour studies, line drawings and interface screenshots arranged in a flow" loading="lazy">
       <figcaption>Working board</figcaption>
     </figure>
     <p>The current idea is a silhouette of my backyard represented in gradients, with an amorphous weed that moves and reacts. Still, it fades to grey. With movement, the visuals build.</p>
@@ -305,7 +350,7 @@ footer a:hover{color:var(--leaf)}
     <h3>Nodes</h3>
     <p>Much of the work here has been rethinking the geometry node setup.</p>
     <figure>
-      <img src="images/journal/sep-01.jpg" alt="A blurred car park photograph with a red hand-drawn flower and figure sketched over it" loading="lazy">
+      <img src="images/journal/image%2017.png" alt="A blurred car park photograph with a red hand-drawn flower and figure sketched over it" loading="lazy">
       <figcaption>Drawing the piece into a non-place</figcaption>
     </figure>
     <p>Getting the new geometry-node mesh to look at the cursor, which stands in for the user's head. Using absolute world space on Z is a highly effective way to get a hazy void. Artistically I am moving toward lit shaders, since pure emissive is a bit too formless at this stage. Materials need iterating sooner rather than later.</p>
@@ -315,7 +360,7 @@ footer a:hover{color:var(--leaf)}
     <p class="date">12 September</p>
     <h3>Expected response in the gallery</h3>
     <figure>
-      <img src="images/journal/sep-02.jpg" alt="Blender animation workspace: a bloom render above, the node graph below, with an animation label" loading="lazy">
+      <img src="images/journal/image%2015.png" alt="Blender animation workspace: a bloom render above, the node graph below, with an animation label" loading="lazy">
     </figure>
     <p>If someone chooses to stay with the piece, that should still be rewarded and not read as a negative encounter. After all, they are choosing to stay.</p>
     <p>I will have to think about not making the neutral state too mundane, or reading as depressing.</p>
@@ -324,14 +369,15 @@ footer a:hover{color:var(--leaf)}
   <article class="entry read" id="sep-14">
     <p class="date">14 September</p>
     <h3>Feedback</h3>
-    <figure>
-      <img src="images/journal/sep-03.jpg" alt="Two small drawings: a pencil sketch of a figure, and a blue-ground line drawing of a bloom" loading="lazy">
-    </figure>
+    <div class="plate">
+      <img src="images/journal/image%2021.png" alt="Pencil sketches of bundled, hunched figures on a grey ground" loading="lazy">
+      <img src="images/journal/image%2022.png" alt="Line drawing of a many-tendrilled bloom in orange and pink on a blue ground" loading="lazy">
+    </div>
     <p>Refining the concept with Kali Maunder helped a great deal, thinking through the character from a traditional animator's perspective: the squash and tension in the body under anxiety, muscles bundling, hunched shoulders, eye stress lines.</p>
     <p>That informed a fascicles setup in geometry nodes. A mesh curve becomes the stem's body, likely invisible, and the fascicles generate and twist around it. There is potential to have that effect drive morph targets on the character. World position offset might also work, though I know less about it at the point of converting to Unreal.</p>
     <p>The bundle and twist is literal with the knots here. The radius stays the same at the base, with room to expand it later.</p>
     <figure>
-      <img src="images/journal/sep-04.jpg" alt="Contact sheet of around forty small grey renders showing the stem coiling through its range" loading="lazy">
+      <img src="images/journal/image%2019.png" alt="Contact sheet of around forty small grey renders showing the stem coiling through its range" loading="lazy">
       <figcaption>Coil range, frame by frame</figcaption>
     </figure>
   </article>
@@ -340,7 +386,7 @@ footer a:hover{color:var(--leaf)}
     <p class="date">16 September</p>
     <h3>Planning eye states</h3>
     <figure>
-      <img src="images/journal/sep-05.jpg" alt="Storyboard grid of eight annotated sketches showing weed and eye states from coiled and stressed through to open and uncoiled" loading="lazy">
+      <img src="images/journal/image%2026.png" alt="Storyboard grid of eight annotated sketches showing weed and eye states from coiled and stressed through to open and uncoiled" loading="lazy">
       <figcaption>Eye and body states, with the annotations they were planned from</figcaption>
     </figure>
     <p>The eye is becoming a bigger feature. Two-way blends on a Look At node made some interesting shapes, but a clean profile curve is more striking. Right now it snakes around every axis, which distorts the top-heavy shoulder curl that gives the thing character without being a direct human representation.</p>
@@ -350,7 +396,7 @@ footer a:hover{color:var(--leaf)}
     <p class="date">28 September</p>
     <h3>Character profiles</h3>
     <figure>
-      <img src="images/journal/sep-06.jpg" alt="Blender viewport showing the gold coiled creature with its geometry node graph beneath" loading="lazy">
+      <img src="images/journal/image%2024.png" alt="Blender viewport showing the gold coiled creature with its geometry node graph beneath" loading="lazy">
     </figure>
     <p>Adding a taper driven by a profile curve. It reads as a more interesting shape, and as more open and receptive. A stretch goal is to use Unreal's Niagara system to span extra meshes across the body. The shapes are good: when open, the tendrils almost look like a hand opening, or exposing an inside.</p>
     <p>Most of my past animation experience was in Maya, and mostly simple work. Exploring Blender has been genuinely interesting in this regard, using actions, the dope sheet and the animation graphs with more purpose.</p>
@@ -360,7 +406,7 @@ footer a:hover{color:var(--leaf)}
       <li>Visuals still undecided. I like the flat look but have not explored custom GLSL or HLSL shaders. For now I like the flat saturated colour and the shared shader logic of world Z or height, going to a flat dark purple with possible hints of luminescent grass tips. I have a past animation of flat colours against a silhouette that could be striking and simple.</li>
     </ul>
     <figure>
-      <img src="images/journal/sep-07.jpg" alt="Blender viewport with the creature uncoiled and a white eye visible at the head" loading="lazy">
+      <img src="images/journal/image%2025.png" alt="Blender viewport with the creature uncoiled and a white eye visible at the head" loading="lazy">
     </figure>
   </article>
 
@@ -371,22 +417,89 @@ footer a:hover{color:var(--leaf)}
     <p class="date">5 October</p>
     <h3>Geo Nodes, Unreal, TouchDesigner</h3>
     <figure>
-      <img src="images/journal/oct-01.jpg" alt="Webcam feed of a person with pose landmarks overlaid, beside the TouchDesigner network reading it" loading="lazy">
+      <img src="images/journal/image%2028.png" alt="Webcam feed of a person with pose landmarks overlaid, beside the TouchDesigner network reading it" loading="lazy">
       <figcaption>MediaPipe reading a live feed</figcaption>
     </figure>
     <p>This will be a good point to test with the cohort and with friends and family. The next phase is refining the data coming out of TouchDesigner.</p>
     <p>I had been testing with a pre-recorded video stream decoded by MediaPipe, to confirm the movement actually reaches Unreal. The data dictates how reliably the interaction can be tested, so it needs more attention than I first gave it.</p>
     <p>MediaPipe takes a webcam as its feed, and a live camera with real movement is better than a recording. OBS Studio can make a virtual camera from a looped file for the cases where I need something repeatable.</p>
     <figure>
-      <img src="images/journal/oct-02.jpg" alt="TouchDesigner network of green operator nodes routing MediaPipe channels into a merge" loading="lazy">
+      <img src="images/journal/image%2029.png" alt="TouchDesigner network of green operator nodes routing MediaPipe channels into a merge" loading="lazy">
       <figcaption>MediaPipe container, averaging the ear channels</figcaption>
     </figure>
     <p>In the MediaPipe container, selecting and averaging the ears across X and Y on all four channels works better than the alternatives. MediaPipe also outputs a visibility channel for the ears, which makes presence easier to detect than I expected.</p>
     <figure>
-      <img src="images/journal/oct-03.jpg" alt="Plate of deformation tests: line studies of coiled forms, a gold curve on red, and a tendril on teal" loading="lazy">
+      <img src="images/journal/image%2020-1.png" alt="Plate of deformation tests: line studies of coiled forms, a gold curve on red, and a tendril on teal" loading="lazy">
       <figcaption>Testing methods of deformation</figcaption>
     </figure>
-    <p>Currently a back and forth over how far a bone can coil in Blender. I wrote a script that creates the skeleton uniformly along a spline. I had been building the chain as a straight vertical and then posing it, but that is not needed here.</p>
+    <p>Currently a back and forth over how far a bone can coil in Blender. I used Claude to write a script that builds the skeleton uniformly along a spline. I had been building the chain as a straight vertical and then posing it, but that is not needed here.</p>
+
+    <details class="ai">
+      <summary>AI use &middot; bone chain generator</summary>
+      <div class="body">
+        <p class="lbl">Tool</p>
+        <p class="after" style="margin-bottom:18px">Claude (Anthropic), model <code>claude-opus-5</code>. Used to write the script below, which I then ran, read and adjusted in Blender.</p>
+
+        <p class="lbl">Prompt</p>
+        <blockquote>In Blender, I have a curve called <code>Spline_Fiddle</code> that describes the shape of a plant stem. Write a Python script that builds an armature along it with 24 bones, spaced evenly by arc length rather than by control point, each connected to the one before it and named <code>stem_00</code> upward. I want the chain generated already in the curve's final shape rather than built vertical and posed afterwards.</blockquote>
+
+        <p class="lbl">Script</p>
+        <pre>import bpy
+
+CURVE  = "Spline_Fiddle"      # the curve the stem follows
+ARM    = "ARM_Fiddle"
+COUNT  = 24                   # bones in the chain
+PREFIX = "stem_"
+
+def sample_curve(obj, n):
+    """n+1 points spaced evenly by arc length along the evaluated curve."""
+    dg   = bpy.context.evaluated_depsgraph_get()
+    ev   = obj.evaluated_get(dg)
+    mesh = ev.to_mesh()
+    pts  = [obj.matrix_world @ v.co for v in mesh.vertices]
+    ev.to_mesh_clear()
+
+    run = [0.0]                           # cumulative length at each vertex
+    for a, b in zip(pts, pts[1:]):
+        run.append(run[-1] + (b - a).length)
+    total = run[-1]
+
+    out, j = [], 0
+    for i in range(n + 1):
+        target = total * i / n
+        while j &lt; len(run) - 2 and run[j + 1] &lt; target:
+            j += 1
+        span = run[j + 1] - run[j]
+        f = 0.0 if span == 0 else (target - run[j]) / span
+        out.append(pts[j].lerp(pts[j + 1], f))
+    return out
+
+curve = bpy.data.objects[CURVE]
+pts   = sample_curve(curve, COUNT)
+
+arm_data = bpy.data.armatures.new(ARM)
+arm_obj  = bpy.data.objects.new(ARM, arm_data)
+bpy.context.collection.objects.link(arm_obj)
+bpy.context.view_layer.objects.active = arm_obj
+bpy.ops.object.mode_set(mode='EDIT')
+
+parent = None
+for i in range(COUNT):
+    b = arm_data.edit_bones.new(f"{PREFIX}{i:02d}")
+    b.head = pts[i]
+    b.tail = pts[i + 1]
+    if parent:
+        b.parent = parent
+        b.use_connect = True
+    parent = b
+
+bpy.ops.object.mode_set(mode='OBJECT')
+print(f"{COUNT} bones along {CURVE}")</pre>
+
+        <p class="lbl">What I changed</p>
+        <p class="after">The first version spaced the bones by control point, which bunched them where the curve was dense and left the tip under-articulated. Resampling by arc length fixed it. I also had to set the armature modifier to the top of the modifier stack by hand, above GeometryNodes, or the deformation evaluated in the wrong order.</p>
+      </div>
+    </details>
     <p>The curve has an interesting character to it. A bit like a warbled question mark.</p>
     <p>A world position offset shader has been harder to get right than I thought. Presence and detection feel good, and I am leaning away from making a direct character. It is an assumption, but a character or a puppet tells you what it is, and that leaves less room for curiosity.</p>
   </article>
@@ -395,7 +508,7 @@ footer a:hover{color:var(--leaf)}
     <p class="date">14 October</p>
     <h3>Touch measurements</h3>
     <figure>
-      <img src="images/journal/oct-04.jpg" alt="Two TouchDesigner panels showing shoulder-width measurement between tracked points" loading="lazy">
+      <img src="images/journal/image%2030.png" alt="Two TouchDesigner panels showing shoulder-width measurement between tracked points" loading="lazy">
     </figure>
     <p>Exploring the idea of the shared energy needed to make an interactive exhibit whole. Someone interacting with the exhibit is more or less what the exhibition is. The pressure to perform is shared by the weed, which oscillates between a subdued, guarded state and an open one depending on what it is given.</p>
     <p>Changing from head to <strong>shoulders</strong> for the uncoiling. Much easier to measure the distance between those two points than the head, which can turn.</p>
@@ -406,17 +519,17 @@ footer a:hover{color:var(--leaf)}
   &rarr; into the existing Merge</pre>
     <p>After discussing the project and thinking harder about expected behaviour from a participant, the coil and uncoil will not be driven by movement alone. Presence can still uncoil the weed.</p>
     <figure>
-      <img src="images/journal/oct-05.jpg" alt="Unreal Blueprint graph with a Switch on String node routing the incoming OSC addresses" loading="lazy">
+      <img src="images/journal/image%2031.png" alt="Unreal Blueprint graph with a Switch on String node routing the incoming OSC addresses" loading="lazy">
     </figure>
     <p>Using Switch on String, I can filter out <code>/head_tx</code>, <code>/head_ty</code> and the rest, then set a variable of the same name. Presence arrives as something like 0.5336666, so bands of values between 0 and 1 can drive different parts of the animation and the scene.</p>
     <p>Proximity needs proper calibration, ideally with the ability to change the numbers on the fly. That is the part that can only be done once, properly, in the actual room: stand where the furthest viewer will realistically be and note the value, then stand at the closest point that should count as fully engaged and note that.</p>
     <figure>
-      <img src="images/journal/oct-06.jpg" alt="Wide Unreal Blueprint graph of the value filtering chain" loading="lazy">
+      <img src="images/journal/image%2032.png" alt="Wide Unreal Blueprint graph of the value filtering chain" loading="lazy">
     </figure>
     <p>Dialling in the interaction by clamping the spine so it moves predictably while keeping a distinct silhouette.</p>
     <p>It is nice and simple as it stands, and I would like to explore other aspects of the interaction, particularly dynamic sound. The initial idea is sonification built from recordings of my backyard, with more ambient creature noises for the relaxed state, and loose against tight wire strums for the rest.</p>
     <figure>
-      <img src="images/journal/oct-07.jpg" alt="Unreal animation Blueprint with a large commented region driving the coil" loading="lazy">
+      <img src="images/journal/image%2036.png" alt="Unreal animation Blueprint with a large commented region driving the coil" loading="lazy">
     </figure>
     <p>Shoulder width controls the coiling, open or engaged based on an estimate of body position. Pluck uses vertex world position offset linked to the wrists. I was wary of adding another form of interaction for a number of reasons, but it turned out to be the natural progression and was surprisingly fast to retool, since most of the logic already existed.</p>
     <p>Having watched people use it, I am reluctant to add more variables, but the neon green pluck band needs separating from delta time so it responds to raw movement instead. Right now it fires more or less constantly, which drains it of meaning.</p>
@@ -427,11 +540,11 @@ footer a:hover{color:var(--leaf)}
     <p class="date">18 October</p>
     <h3>Mote field</h3>
     <figure>
-      <img src="images/journal/oct-08.jpg" alt="Night scene with a pale moon and the creature's strands lit against deep blue, beside its Blueprint panel" loading="lazy">
+      <img src="images/journal/image%2037.png" alt="Night scene with a pale moon and lit strands, the hand capsule and the mote field shown in debug" loading="lazy">
     </figure>
     <figure>
-      <img src="images/journal/oct-09.jpg" alt="Debug view: a white capsule and wireframe sphere marking tracked hand positions among floating motes" loading="lazy">
-      <figcaption>Hand repellers, shown as debug spheres</figcaption>
+      <img src="images/journal/image%2033.png" alt="Wide view of the mote field Blueprint, the filtering chain laid out across the graph" loading="lazy">
+      <figcaption>The mote field Blueprint</figcaption>
     </figure>
     <p>The mote field was far harder to set up and debug than I anticipated, given I could already track hands reliably with the debug sphere. It meant tightening the particle spawn bounds and revisiting the deprojected plane, visible above as the debug sphere.</p>
     <p>The Blueprint looks complicated, but the system is really just filtering these values. Wrist movement still needs separating for the mote field, though with time running out I moved that to a nice-to-have.</p>
@@ -441,7 +554,7 @@ footer a:hover{color:var(--leaf)}
     <p class="date">22 October</p>
     <h3>The whole chain</h3>
     <figure>
-      <img src="images/journal/oct-10.jpg" alt="Diagram of the Fiddlearm signal chain from webcam through TouchDesigner and OSC into Unreal, ending in spine coil, pluck, mote field and eye" loading="lazy">
+      <img src="images/journal/fiddlearm-signal-chain.png" alt="Diagram of the Fiddlearm signal chain from webcam through TouchDesigner and OSC into Unreal, ending in spine coil, pluck, mote field and eye" loading="lazy">
       <figcaption>Every arrow is one number per frame</figcaption>
     </figure>
     <p>Drawn out, the system is much smaller than the Blueprint suggests. Three numbers cross from TouchDesigner into Unreal and everything else is derived from them. Shoulder width replaced head tracking because the head turns and the shoulders do not. Movement is read as speed rather than position, so the plant answers to how you move instead of where you are.</p>
