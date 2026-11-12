@@ -302,6 +302,25 @@ video.thumb{pointer-events:none}
 }
 @media (max-width:680px){ .panel .clip{max-width:min(300px, 82vw)} }
 
+/* YouTube embed: a placeholder until asked for, so the page never pays
+   for their player on load. The iframe is injected on first open. */
+.tube{
+  position:relative;width:100%;max-width:860px;aspect-ratio:16/9;
+  border:1px solid var(--line);background:#0d0d10;
+}
+.tube iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.tube-play{
+  position:absolute;inset:0;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:transparent;border:0;cursor:pointer;
+  font-family:var(--font-ui);font-size:14px;font-weight:500;
+  color:var(--cream);letter-spacing:.02em;
+  transition:background .15s,color .15s;
+}
+.tube-play:hover{background:rgba(159,191,106,.09);color:var(--leaf)}
+.tube-play:focus-visible{outline:2px solid var(--leaf);outline-offset:-3px}
+.tube-play span{font-size:18px;line-height:1}
+
 .c-wide{grid-column:span 7}
 .c-side{grid-column:span 5}
 .c-half{grid-column:span 6}
@@ -434,6 +453,12 @@ html{scroll-behavior:smooth}
           </div>
         </div>
         <div class="panel" id="p-fiddlearm"><div><div class="inner">
+          <div class="tube" data-embed="https://www.youtube-nocookie.com/embed/aAnDnPYJmXs"
+               data-title="Fiddlearm explainer">
+            <button type="button" class="tube-play" aria-label="Play the Fiddlearm explainer">
+              <span aria-hidden="true">&#9654;</span> Watch the explainer
+            </button>
+          </div>
           <p class="note">The creature at the top of this page is the piece, rebuilt for the web from the same Blender rig. The installation ran on a 55-inch monitor in a shared gallery room, driven live by pose tracking. The whole build is written up in the <a href="journal.html">process journal</a>.</p>
         </div></div></div>
       </div>
@@ -1128,6 +1153,26 @@ html{scroll-behavior:smooth}
   mob.addEventListener('click', e => { if(e.target.tagName === 'A') setNav(false); });
   addEventListener('keydown', e => { if(e.key === 'Escape') setNav(false); });
 
+  // ---- YouTube, loaded only when someone asks for it ----
+  function mountTube(tube){
+    const src = tube.dataset.embed;
+    if(!src) return;
+    tube.removeAttribute('data-embed');          // so it only ever happens once
+    const f = document.createElement('iframe');
+    f.src = src + '?rel=0';
+    f.title = tube.dataset.title || 'Video';
+    f.allow = 'accelerometer; clipboard-write; encrypted-media; picture-in-picture';
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    f.allowFullscreen = true;
+    tube.replaceChildren(f);
+  }
+  document.querySelectorAll('.tube-play').forEach(b => {
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      mountTube(b.closest('.tube'));
+    });
+  });
+
   // ---- expanding work cards ----
   document.querySelectorAll('.item .card h3 button').forEach(b => {
     b.addEventListener('click', () => {
@@ -1149,6 +1194,9 @@ html{scroll-behavior:smooth}
         if(t) t.pause();
         const v = item.querySelector('.panel video');
         if(v) v.play().catch(() => {});
+        // swap the placeholder for the real player, once
+        const tube = item.querySelector('.tube[data-embed]');
+        if(tube) mountTube(tube);
       }
     });
   });
