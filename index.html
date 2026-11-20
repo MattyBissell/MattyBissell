@@ -12,7 +12,7 @@
   document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
 })();
 </script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Stencil:wght@800&family=Archivo:wght@400;500;600&display=swap">
 <style>
 /* Dark-committed, matching the Blender comp. Creature is an element, not a background,
    so the eye maps to its box in percent and nothing crops. */
@@ -29,6 +29,7 @@
   --line:#2a2a30;
   --muted:#7d7a85;
   --font-display:"Anton",Impact,"Arial Narrow",sans-serif;
+  --font-stencil:"Big Shoulders Stencil","Anton",Impact,sans-serif;
   --font-ui:"Archivo",system-ui,-apple-system,sans-serif;
   color-scheme:dark;
 }
@@ -198,7 +199,7 @@ body[data-navopen="true"] header{transform:none!important;z-index:60}
 .cue span{display:inline-block;margin-left:6px;animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 .hero h1{
-  font-family:var(--font-display);font-weight:400;
+  font-family:var(--font-stencil);font-weight:800;text-transform:uppercase;
   font-size:clamp(30px,5.6vw,58px);line-height:1.04;margin:0 0 18px;
   max-width:16ch;text-wrap:balance;letter-spacing:.01em;
 }
@@ -419,12 +420,12 @@ nav.mob .theme{
    --paper is sampled from the cream render once it loads, so the page and
    the video's baked background meet without a visible edge. */
 html[data-theme="light"]{
-  --bg:var(--paper,#E3DACF);
+  --bg:var(--paper,#E0D8CD);
   --cream:#14130f;
-  --ink:var(--paper,#E3DACF);
+  --ink:var(--paper,#E0D8CD);
   --cream-dim:#3d3930;
   --beige:#1f1c17;
-  --leaf:#5d7f2a;
+  --leaf:#6b2a5e;               /* twilight plum, from the bloom's pink-purple */
   --line:#c4b8a6;
   --muted:#6b665c;
   color-scheme:light;
