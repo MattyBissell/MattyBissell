@@ -2,6 +2,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Matty Bissell</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>
+/* theme is set before first paint so the cream version never flashes black.
+   ?theme=light or ?theme=dark in the URL wins over the saved choice. */
+(function(){
+  var t = null;
+  try { t = new URLSearchParams(location.search).get('theme'); } catch(e){}
+  if(t !== 'light' && t !== 'dark'){ try { t = localStorage.getItem('mb-theme'); } catch(e){} }
+  document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+})();
+</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
 <style>
 /* Dark-committed, matching the Blender comp. Creature is an element, not a background,
@@ -114,6 +124,9 @@ nav.mob a{
 nav.mob a:active{border-bottom-color:var(--leaf);color:var(--leaf)}
 nav.mob[data-open="true"]{opacity:1;visibility:visible;transform:none}
 body[data-navopen="true"]{overflow:hidden}
+/* the parallax transform on header would make the fixed sheet position
+   against the header instead of the viewport */
+body[data-navopen="true"] header{transform:none!important;z-index:60}
 
 /* ---------- creature ---------- */
 .creature{
@@ -375,6 +388,69 @@ footer{
   .hero{padding-block:30px 34px}
   .frame{padding:22px 20px 24px}
 }
+/* ---------- theme toggle ---------- */
+.theme{
+  font-family:var(--font-ui);cursor:pointer;
+  background:transparent;color:var(--cream);
+  border:1.5px solid var(--cream);
+  display:flex;align-items:center;gap:10px;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.theme i{
+  display:block;width:10px;height:10px;border-radius:50%;flex:0 0 auto;
+  border:1.5px solid currentColor;
+  background:linear-gradient(90deg,currentColor 50%,transparent 50%);
+}
+.theme:hover{background:var(--leaf);border-color:var(--leaf);color:var(--ink)}
+.theme:focus-visible{outline:2px solid var(--leaf);outline-offset:2px}
+nav.desk .theme{
+  font-size:15px;font-weight:500;padding:8px 26px 8px 16px;
+  min-width:190px;margin-top:6px;text-align:left;
+}
+nav.mob .theme{
+  align-self:flex-start;margin-top:28px;
+  font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  padding:12px 18px;
+}
+
+/* ---------- light (cream) theme ----------
+   Swaps the variables rather than restyling, so the dark site's rules mostly
+   invert themselves: --cream becomes the foreground ink, --ink becomes paper.
+   --paper is sampled from the cream render once it loads, so the page and
+   the video's baked background meet without a visible edge. */
+html[data-theme="light"]{
+  --bg:var(--paper,#E3DACF);
+  --cream:#14130f;
+  --ink:var(--paper,#E3DACF);
+  --cream-dim:#3d3930;
+  --beige:#1f1c17;
+  --leaf:#5d7f2a;
+  --line:#c4b8a6;
+  --muted:#6b665c;
+  color-scheme:light;
+}
+html[data-theme="light"] body{transition:background-color .3s ease,color .3s ease}
+html[data-theme="light"] .creature video{filter:none}
+html[data-theme="light"] .rule{display:none}
+html[data-theme="light"] .eye{box-shadow:0 0 0 3px #14130f}
+html[data-theme="light"] .eye i{background:#14130f}
+html[data-theme="light"] .eyebrow{color:var(--cream)}
+
+/* the hero frame stays a dark slab with cream type */
+html[data-theme="light"] .frame{
+  --cream:#E3DACF;--cream-dim:#c9c5ba;
+  background:#14130f;border-color:#14130f;color:var(--cream);
+}
+
+/* cards are dark on cream; re-scope the dark palette inside them */
+html[data-theme="light"] .card .body p a{text-decoration-color:rgba(227,218,207,.45)}
+html[data-theme="light"] .card.dark{
+  --cream:#E3DACF;
+  background:#0f0f12;border-color:#0f0f12;color:var(--cream);
+}
+html[data-theme="light"] .tube{--cream:#E3DACF;--leaf:#9fbf6a}
+html[data-theme="light"] .loader{--cream:#E3DACF;--line:#2a2a30;--muted:#7d7a85;--leaf:#9fbf6a}
+
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;scroll-behavior:auto!important}
 }
@@ -410,6 +486,9 @@ html{scroll-behavior:smooth}
         <a href="#work">Work</a>
         <a href="#me">Me</a>
         <a href="#contact">Contact</a>
+        <button type="button" class="theme" data-theme-toggle aria-pressed="false">
+          <i aria-hidden="true"></i><span>Light</span>
+        </button>
       </nav>
 
       <button class="burger" id="burger" aria-expanded="false" aria-controls="mobnav" aria-label="Menu">
@@ -420,6 +499,9 @@ html{scroll-behavior:smooth}
       <a href="#work">Work</a>
       <a href="#me">Me</a>
       <a href="#contact">Contact</a>
+      <button type="button" class="theme" data-theme-toggle aria-pressed="false">
+        <i aria-hidden="true"></i><span>Light</span>
+      </button>
     </nav>
   </div>
 </header>
@@ -621,9 +703,22 @@ html{scroll-behavior:smooth}
 
   // Each clip carries its own track and frame rate, so the eye stays locked
   // to the head whichever one is playing.
+  // src and track can be lists: each is tried in order until one loads.
   const CLIPS = {
     idle: {
       src:'media/anim_idle_v1.mp4', track:'media/anim_idle_v1.json',
+      fps:24, loop:true, startAt:0
+    },
+    // light theme. Idle only for now: no cream descent exists yet, so the
+    // scroll trip is switched off while this theme is live. When
+    // anim_scroll_down_cream_v1 is rendered, add a down_cream entry and
+    // drop the light-theme guards in startBoil and the scroll handler.
+    // The track falls back to the dark idle one, which is the same rig/timing.
+    // GitHub Pages is case-sensitive, so the capitalised file on disk is
+    // kept as a fallback until it's renamed.
+    idle_cream: {
+      src:['media/anim_idle_cream_v1.mp4', 'media/anim_idle_Cream_v1.mp4'],
+      track:['media/anim_idle_cream_v1.json', 'media/anim_idle_v1.json'],
       fps:24, loop:true, startAt:0
     },
     down: {
@@ -643,9 +738,9 @@ html{scroll-behavior:smooth}
   // Two thresholds so a scroll that hovers on the line doesn't flap.
   let TRIP_DOWN = 0.14, TRIP_UP = 0.06;
 
-  const VIDEO_SRC = CLIPS.idle.src;
-  const TRACK_SRC = CLIPS.idle.track;
-  const FPS       = CLIPS.idle.fps;
+  const isLight  = () => document.documentElement.dataset.theme === 'light';
+  const idleClip = () => isLight() ? CLIPS.idle_cream : CLIPS.idle;
+  const FPS      = CLIPS.idle.fps;
 
   // ---- inline the wordmark so its colour comes from CSS ----
   // Leaves the <img> in place if this fails (file:// or a 404), so it
@@ -703,17 +798,20 @@ html{scroll-behavior:smooth}
     }
   }
 
-  // one place that attaches a source, so the deployed path and the picker behave the same
-  function attachVideo(src){
-    function onMeta(){
-      vid.removeEventListener('loadedmetadata', onMeta);
+  // one place that attaches a source, so the deployed path and the picker behave the same.
+  // Handlers are assigned, not added, so a theme swap never stacks stale ones.
+  function attachVideo(src, onFail){
+    vid.onloadedmetadata = () => {
       if(vid.videoWidth) box.style.aspectRatio = vid.videoWidth + ' / ' + vid.videoHeight;
       haveVideo = true;
       ready();
       vid.play().catch(() => say('render ok · click the page to start it'));
-    }
-    vid.addEventListener('loadedmetadata', onMeta);
-    vid.addEventListener('canplay', () => { vid.play().catch(()=>{}); }, {once:true});
+    };
+    vid.oncanplay = () => { vid.oncanplay = null; vid.play().catch(()=>{}); };
+    // fetch() fails outright on file://, so the video is judged by its own
+    // error event rather than a HEAD probe
+    vid.onerror = () => { if(!haveVideo){ if(onFail) onFail(); else ready(); } };
+    vid.onloadeddata = samplePaper;
     vid.src = src;
     vid.load();
   }
@@ -723,10 +821,49 @@ html{scroll-behavior:smooth}
     ready();
   }
 
-  // ---- try the deployed paths ----
-  // fetch() fails outright on file://, so the video is attached directly and
-  // judged by its own error event rather than a HEAD probe
-  vid.addEventListener('error', () => { if(!haveVideo) ready(); }, {once:true});
+  // ---- match the page to the cream render's baked background ----
+  // Reads one corner pixel. Skipped on file:// (tainted canvas) and if the
+  // corner isn't plausibly paper, in which case the CSS fallback stands.
+  const paperCanvas = document.createElement('canvas');
+  paperCanvas.width = 32; paperCanvas.height = 18;
+  function samplePaper(){
+    if(!isLight() || !vid.videoWidth) return;
+    try {
+      const g = paperCanvas.getContext('2d', {willReadFrequently:true});
+      g.drawImage(vid, 0, 0, 32, 18);
+      const [r, gg, b] = g.getImageData(1, 1, 1, 1).data;
+      if(0.2126*r + 0.7152*gg + 0.0722*b < 150) return;
+      document.documentElement.style.setProperty('--paper', `rgb(${r},${gg},${b})`);
+    } catch(e){}
+  }
+
+  // ---- load whichever idle belongs to the current theme ----
+  // A token guards against a slow fetch from the previous theme landing late.
+  let loadToken = 0;
+  function loadIdle(){
+    const c = idleClip(), my = ++loadToken;
+    haveVideo = false; track = null;
+    eye.dataset.ready = 'false';
+
+    const srcs = [].concat(c.src);
+    let si = 0;
+    (function nextSrc(){
+      if(my !== loadToken) return;
+      if(si >= srcs.length){ ready(); return; }
+      attachVideo(srcs[si++], nextSrc);
+    })();
+
+    const tracks = [].concat(c.track);
+    let ti = 0;
+    (function nextTrack(){
+      if(my !== loadToken) return;
+      if(ti >= tracks.length){ ready(); return; }
+      fetch(tracks[ti++])
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(raw => { if(my === loadToken) setTrack(raw); })
+        .catch(nextTrack);
+    })();
+  }
 
   // ---- autoplay rescue ----
   // Edge and Safari refuse muted autoplay until the site has interaction
@@ -827,8 +964,7 @@ html{scroll-behavior:smooth}
     }
     requestAnimationFrame(step);
   })();
-  attachVideo(VIDEO_SRC);
-  fetch(TRACK_SRC).then(r => r.ok ? r.json() : Promise.reject()).then(setTrack).catch(ready);
+  loadIdle();
 
   // ---- descent clip, loaded quietly alongside ----
   vidD.src = CLIPS.down.src;
@@ -855,6 +991,7 @@ html{scroll-behavior:smooth}
 
   function startBoil(to){
     if(boilAt || to === state || !trackD || !haveVideo) return;
+    if(to === 'down' && isLight()) return;   // no cream descent yet
     // reduced motion and phones lose the agitation, not the clip change
     if(plain()){ doSwap(to); return; }
     boilTo = to; boilSwapped = false; boilAt = performance.now();
@@ -918,6 +1055,7 @@ html{scroll-behavior:smooth}
 
   // ---- scroll decides which clip is live ----
   addEventListener('scroll', () => {
+    if(isLight()) return;                    // cream idle holds through the scroll
     const y = scrollY / innerHeight;
     if(state === 'idle' && y > TRIP_DOWN) startBoil('down');
     else if(state === 'down' && y < TRIP_UP) startBoil('idle');
@@ -1051,7 +1189,7 @@ html{scroll-behavior:smooth}
     });
     btn('breathe', () => BREATH.trigger());
     btn('reload src', () => {
-      const s = vid.currentSrc || VIDEO_SRC;
+      const s = vid.currentSrc || [].concat(idleClip().src)[0];
       vid.removeAttribute('src');
       vid.load();
       vid.src = s;
@@ -1152,6 +1290,32 @@ html{scroll-behavior:smooth}
   burger.addEventListener('click', () => setNav(mob.dataset.open !== 'true'));
   mob.addEventListener('click', e => { if(e.target.tagName === 'A') setNav(false); });
   addEventListener('keydown', e => { if(e.key === 'Escape') setNav(false); });
+
+  // ---- theme toggle ----
+  const toggles = document.querySelectorAll('[data-theme-toggle]');
+  function labelToggles(){
+    const light = isLight();
+    toggles.forEach(b => {
+      b.setAttribute('aria-pressed', String(light));
+      b.querySelector('span').textContent = light ? 'Dark' : 'Light';
+      b.setAttribute('aria-label', light ? 'Switch to dark version' : 'Switch to light version');
+    });
+  }
+  function setTheme(t){
+    if(t === document.documentElement.dataset.theme) return;
+    // leave the descent cleanly before the idle underneath is replaced
+    if(state === 'down'){ boilAt = 0; boilTo = null; doSwap('idle'); }
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem('mb-theme', t); } catch(e){}
+    labelToggles();
+    setRate(1);
+    loadIdle();
+  }
+  toggles.forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    setTheme(isLight() ? 'dark' : 'light');
+  }));
+  labelToggles();
 
   // ---- YouTube, loaded only when someone asks for it ----
   function mountTube(tube){
