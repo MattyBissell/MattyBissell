@@ -3,13 +3,14 @@
 <title>Matty Bissell</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>
-/* theme is set before first paint so the cream version never flashes black.
+/* theme is set before first paint so the page never flashes the wrong one.
    ?theme=light or ?theme=dark in the URL wins over the saved choice. */
 (function(){
   var t = null;
   try { t = new URLSearchParams(location.search).get('theme'); } catch(e){}
   if(t !== 'light' && t !== 'dark'){ try { t = localStorage.getItem('mb-theme'); } catch(e){} }
-  document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+  // light is the default for now; dark only when asked for or saved
+  document.documentElement.dataset.theme = t === 'dark' ? 'dark' : 'light';
 })();
 </script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600&display=swap">
@@ -445,6 +446,14 @@ html[data-theme="light"] .creature video{
           mask-image:linear-gradient(to bottom,transparent 0,#000 5%,#000 95%,transparent 100%);
 }
 html[data-theme="light"] .rule{display:none}
+/* the slide clips sideways inside the body padding, which shows the glow's
+   cut edges on cream; run it under the padding so the clip is the screen edge */
+html[data-theme="light"] .slide{
+  --gutter-l:max(16px,env(safe-area-inset-left,0px));
+  --gutter-r:max(16px,env(safe-area-inset-right,0px));
+  margin-left:calc(-1 * var(--gutter-l));margin-right:calc(-1 * var(--gutter-r));
+  padding-left:var(--gutter-l);padding-right:var(--gutter-r);
+}
 html[data-theme="light"] .eye{box-shadow:0 0 0 3px #14130f}
 html[data-theme="light"] .eye i{background:#14130f}
 html[data-theme="light"] .eyebrow{color:var(--cream)}
@@ -989,9 +998,15 @@ html{scroll-behavior:smooth}
   })();
   loadIdle();
 
-  // ---- descent clip, loaded quietly alongside ----
-  vidD.src = CLIPS.down.src;
-  vidD.load();
+  // ---- descent clip, loaded quietly alongside (dark theme only) ----
+  let downLoaded = false;
+  function ensureDown(){
+    if(downLoaded) return;
+    downLoaded = true;
+    vidD.src = CLIPS.down.src;
+    vidD.load();
+  }
+  if(!isLight()) ensureDown();
   // Park it on its start frame up front. Seeking is async, so seeking and
   // playing in the same tick lets it run from 0 until the seek lands.
   function parkDown(){
@@ -999,7 +1014,7 @@ html{scroll-behavior:smooth}
     try { vidD.currentTime = CLIPS.down.startAt; } catch(e){}
     return true;
   }
-  vidD.addEventListener('loadedmetadata', parkDown, {once:true});
+  vidD.addEventListener('loadedmetadata', parkDown);
   fetch(CLIPS.down.track)
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(raw => { trackD = raw.map(p => ({x:+p[0], y:+p[1]})); })
@@ -1015,6 +1030,7 @@ html{scroll-behavior:smooth}
   function startBoil(to){
     if(boilAt || to === state || !trackD || !haveVideo) return;
     if(to === 'down' && isLight()) return;   // no cream descent yet
+    if(to === 'down') ensureDown();
     // reduced motion and phones lose the agitation, not the clip change
     if(plain()){ doSwap(to); return; }
     boilTo = to; boilSwapped = false; boilAt = performance.now();
@@ -1107,7 +1123,25 @@ html{scroll-behavior:smooth}
     r.readAsText(f);
   });
   document.getElementById('dismiss').addEventListener('click', () => { loader.hidden = true; });
-  addEventListener('click', () => { if(haveVideo && vid.paused) vid.play().catch(()=>{}); });
+  addEventListener('click', () => { if(haveVideo && vid.paused && creatureSeen) vid.play().catch(()=>{}); });
+
+  // ---- only decode what's on screen ----
+  // The idle creature pauses once it's scrolled away (the descent is left
+  // alone: it holds and ends on its own). The Metamorphosis thumb too.
+  let creatureSeen = true;
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(([e]) => {
+      creatureSeen = e.isIntersecting;
+      if(state !== 'idle' || !haveVideo) return;
+      if(creatureSeen) vid.play().catch(() => {});
+      else vid.pause();
+    }, {rootMargin:'80px'}).observe(box);
+    const thumbs = new IntersectionObserver(es => es.forEach(e => {
+      if(e.isIntersecting) e.target.play().catch(() => {});
+      else e.target.pause();
+    }), {rootMargin:'120px'});
+    document.querySelectorAll('video.thumb').forEach(v => thumbs.observe(v));
+  }
 
   // ---- cursor ----
   addEventListener('pointermove', e => {
@@ -1316,25 +1350,35 @@ html{scroll-behavior:smooth}
 
   // ---- stencil headline ----
   // The real h1 stays in the page for layout, selection and screen readers,
-  // and goes transparent. A canvas behind it redraws every frame:
-  //   slab    = the dark idle render, synced to the cream one and aligned to
-  //             the creature's box, so the frame reads as an x-ray of it
-  //   letters = the cream scene behind, blurred and washed with cream, so the
-  //             strands soften instead of carving up the words
+  // and goes transparent. A canvas behind it draws:
+  //   slab    = the dark idle (a 960px copy), synced to the cream render and
+  //             aligned to the creature's box, so the frame reads as an x-ray
+  //   letters = the cream scene behind, softened by drawing it tiny and
+  //             scaling it up, then washed with cream
+  // Kept light: it only redraws when the video presents a new frame or the
+  // page moves, only copies the part of each video under the frame, and is
+  // switched off entirely on phones, reduced motion and data saver, where
+  // the frame falls back to solid ink with cream type.
   const h1 = document.querySelector('.hero h1');
   const frameEl = document.querySelector('.frame');
   const slab = document.querySelector('.slab');
   const sctx = slab && slab.getContext ? slab.getContext('2d') : null;
   const letters = document.createElement('canvas');
   const lctx = letters.getContext('2d');
-  const BLUR_OK = lctx && typeof lctx.filter === 'string';
+  const fog = document.createElement('canvas');
+  const fctx = fog.getContext('2d');
   const STENCIL = {
+    xraySrc:'media/anim_idle_xray_v1.mp4',
     slabBase:'#0b0b0c',
     slabDim:'rgba(20,19,15,.38)',          // keeps the paragraph readable over strands
-    blur:3,                                 // px, frosted letters
-    wash: BLUR_OK ? 'rgba(224,216,205,.52)' : 'rgba(224,216,205,.72)'
+    fog:6,                                  // letters are sampled at 1/fog size: higher = softer
+    wash:'rgba(224,216,205,.55)',
+    maxFps:30
   };
   window.__stencil = STENCIL;
+
+  const liteQ = matchMedia('(max-width: 720px), (prefers-reduced-motion: reduce)');
+  const lite = () => liteQ.matches || !!(navigator.connection && navigator.connection.saveData);
 
   if(h1){
     const words = h1.textContent.trim().split(/\s+/);
@@ -1345,7 +1389,25 @@ html{scroll-behavior:smooth}
     }));
   }
 
-  // the dark render, loaded the first time the light theme is shown
+  // ---- layout cache: rebuilt on resize and font load, not every frame ----
+  let lay = null;
+  function relayout(){
+    if(!h1) return;
+    const cs = getComputedStyle(h1);
+    const font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    lctx.font = font;
+    const asc = lctx.measureText('Hg').fontBoundingBoxAscent || parseFloat(cs.fontSize) * 0.8;
+    const hr = h1.getBoundingClientRect();
+    // word positions relative to the h1, so the parallax lag cancels out
+    const words = [...h1.querySelectorAll('span')].map(sp => {
+      const r = sp.getBoundingClientRect();
+      return {t:sp.textContent, x:r.left - hr.left, y:r.top - hr.top + asc};
+    });
+    lay = {font, ls:cs.letterSpacing, words};
+    dirty = true;
+  }
+
+  // ---- the dark render, loaded the first time it's needed ----
   let xray = null;
   function ensureXray(){
     if(xray || !frameEl) return;
@@ -1355,11 +1417,9 @@ html{scroll-behavior:smooth}
     xray.preload = 'auto';
     xray.setAttribute('aria-hidden', 'true');
     frameEl.appendChild(xray);
-    xray.src = CLIPS.idle.src;
+    xray.src = STENCIL.xraySrc;
     xray.play().catch(() => {});
   }
-
-  // keep the x-ray on the same frame as the cream render, breath included
   function syncXray(){
     if(!xray || xray.readyState < 2 || vid.readyState < 2) return;
     if(vid.paused){ if(!xray.paused) xray.pause(); }
@@ -1370,92 +1430,121 @@ html{scroll-behavior:smooth}
     const d = xray.duration || 0;
     let drift = xray.currentTime - vid.currentTime;
     if(d) drift = ((drift % d) + d * 1.5) % d - d / 2;   // shortest way round the loop
-    if(Math.abs(drift) > 0.1 && !xray.seeking){
+    if(Math.abs(drift) > 0.12 && !xray.seeking){
       try { xray.currentTime = vid.currentTime; } catch(e){}
     }
   }
 
-  let ascCache = {font:'', asc:0};
-  function ascent(font, fallbackH){
-    if(ascCache.font !== font){
-      lctx.font = font;
-      ascCache = {font, asc: lctx.measureText('Hg').fontBoundingBoxAscent || 0};
-    }
-    return ascCache.asc || fallbackH * 0.8;
+  // Draw video v as if it filled the rect (bx,by,bw,bh) in a W x H space, but
+  // copy only the part inside that space, at k device pixels per CSS pixel.
+  function drawClip(ctx, v, bx, by, bw, bh, W, H, k){
+    const x0 = Math.max(0, bx), y0 = Math.max(0, by);
+    const x1 = Math.min(W, bx + bw), y1 = Math.min(H, by + bh);
+    if(x1 <= x0 || y1 <= y0 || !v.videoWidth) return;
+    const sx = v.videoWidth / bw, sy = v.videoHeight / bh;
+    ctx.drawImage(v,
+      (x0 - bx) * sx, (y0 - by) * sy, (x1 - x0) * sx, (y1 - y0) * sy,
+      x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k);
   }
 
+  let dirty = true, lastDraw = 0, frameSeen = false, stencilOn = false;
+
   function drawStencil(){
-    if(!sctx || !lctx || !h1) return;
-    const fr = frameEl.getBoundingClientRect();
-    if(fr.bottom < 0 || fr.top > innerHeight) return;          // offscreen
     const W = frameEl.clientWidth, H = frameEl.clientHeight;
-    if(!W || !H) return;
-    const dpr = Math.min(2, devicePixelRatio || 1);
+    if(!W || !H || !lay) return;
+    const dpr = Math.min(1.5, devicePixelRatio || 1);
     const pw = Math.round(W * dpr), ph = Math.round(H * dpr);
     if(slab.width !== pw || slab.height !== ph){
       slab.width = letters.width = pw;
       slab.height = letters.height = ph;
     }
+    const f = Math.max(2, STENCIL.fog);
+    const fw = Math.max(1, Math.ceil(W / f)), fh = Math.max(1, Math.ceil(H / f));
+    if(fog.width !== fw || fog.height !== fh){ fog.width = fw; fog.height = fh; }
+
+    const fr = frameEl.getBoundingClientRect();
     const left = fr.left + frameEl.clientLeft, top = fr.top + frameEl.clientTop;
     const cr = box.getBoundingClientRect();
     const cx = cr.left - left, cy = cr.top - top;
 
-    // slab: dark render
-    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // slab: dark render, placed so its creature lands on the cream one
+    sctx.setTransform(1, 0, 0, 1, 0, 0);
     sctx.globalCompositeOperation = 'source-over';
     sctx.fillStyle = STENCIL.slabBase;
-    sctx.fillRect(0, 0, W, H);
+    sctx.fillRect(0, 0, pw, ph);
     if(xray && xray.readyState >= 2){
-      // place the dark frame so its creature lands on the cream one
       const m = CLIPS.idle_cream.darkMap || {scale:1, dx:0, dy:0};
-      const dw = cr.width / m.scale, dh = cr.height / m.scale;
-      sctx.drawImage(xray,
+      drawClip(sctx, xray,
         cx + cr.width  * (0.5 - (0.5 + m.dx) / m.scale),
         cy + cr.height * (0.5 - (0.5 + m.dy) / m.scale),
-        dw, dh);
+        cr.width / m.scale, cr.height / m.scale, W, H, dpr);
     }
     sctx.fillStyle = STENCIL.slabDim;
-    sctx.fillRect(0, 0, W, H);
+    sctx.fillRect(0, 0, pw, ph);
 
-    // letters: shape first, then the cream scene inside it, then the wash
-    const cs = getComputedStyle(h1);
-    const font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-    const asc = ascent(font, parseFloat(cs.fontSize));
+    // fog: the cream scene under the frame, tiny, so scaling it up blurs it
+    fctx.setTransform(1, 0, 0, 1, 0, 0);
+    fctx.fillStyle = '#E0D8CD';
+    fctx.fillRect(0, 0, fw, fh);
+    if(vid.readyState >= 2) drawClip(fctx, vid, cx, cy, cr.width, cr.height, W, H, fw / W);
+
+    // letters: shape, then fog inside it, then the wash
+    const hr = h1.getBoundingClientRect();
+    const ox = hr.left - left, oy = hr.top - top;
     lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     lctx.globalCompositeOperation = 'source-over';
     lctx.clearRect(0, 0, W, H);
-    lctx.font = font;
-    if('letterSpacing' in lctx) lctx.letterSpacing = cs.letterSpacing;
+    lctx.font = lay.font;
+    if('letterSpacing' in lctx) lctx.letterSpacing = lay.ls;
     lctx.fillStyle = '#000';
-    h1.querySelectorAll('span').forEach(s => {
-      const r = s.getBoundingClientRect();                     // includes the parallax lag
-      lctx.fillText(s.textContent, r.left - left, r.top - top + asc);
-    });
+    for(const w of lay.words) lctx.fillText(w.t, ox + w.x, oy + w.y);
+    lctx.setTransform(1, 0, 0, 1, 0, 0);
     lctx.globalCompositeOperation = 'source-in';
-    if(vid.readyState >= 2){
-      if(BLUR_OK) lctx.filter = `blur(${STENCIL.blur}px)`;
-      lctx.drawImage(vid, cx, cy, cr.width, cr.height);
-      if(BLUR_OK) lctx.filter = 'none';
-    } else {
-      lctx.fillStyle = '#E0D8CD';
-      lctx.fillRect(0, 0, W, H);
-    }
+    lctx.imageSmoothingEnabled = true;
+    lctx.drawImage(fog, 0, 0, pw, ph);
     lctx.globalCompositeOperation = 'source-atop';
     lctx.fillStyle = STENCIL.wash;
-    lctx.fillRect(0, 0, W, H);
+    lctx.fillRect(0, 0, pw, ph);
 
-    sctx.setTransform(1, 0, 0, 1, 0, 0);
     sctx.drawImage(letters, 0, 0);
-    document.documentElement.classList.add('stencil-ready');
+    if(!stencilOn){ stencilOn = true; document.documentElement.classList.add('stencil-ready'); }
   }
 
-  (function stencilLoop(){
+  function stencilOff(){
+    if(stencilOn){ stencilOn = false; document.documentElement.classList.remove('stencil-ready'); }
+    if(xray && !xray.paused) xray.pause();
+  }
+
+  // redraw on each new video frame where the browser can say so
+  if('requestVideoFrameCallback' in HTMLVideoElement.prototype){
+    const onFrame = () => { dirty = true; vid.requestVideoFrameCallback(onFrame); };
+    vid.requestVideoFrameCallback(onFrame);
+  }
+  const markDirty = () => { dirty = true; };
+  addEventListener('scroll', markDirty, {passive:true});
+  addEventListener('resize', relayout);
+  if(liteQ.addEventListener) liteQ.addEventListener('change', relayout);
+  if(document.fonts){
+    document.fonts.ready.then(relayout);
+    document.fonts.addEventListener('loadingdone', relayout);
+  }
+  if(frameEl && 'IntersectionObserver' in window){
+    new IntersectionObserver(([e]) => { frameSeen = e.isIntersecting; dirty = true; }).observe(frameEl);
+  } else frameSeen = true;
+  relayout();
+
+  (function stencilLoop(now){
     requestAnimationFrame(stencilLoop);
-    if(!isLight()){ if(xray && !xray.paused) xray.pause(); return; }
+    if(!sctx || !lctx || !fctx || !h1 || !isLight() || lite()){ stencilOff(); return; }
+    if(!frameSeen){ if(xray && !xray.paused) xray.pause(); return; }
     ensureXray();
     syncXray();
+    // no rVFC: fall back to a steady low rate
+    if(!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) dirty = true;
+    if(!dirty || now - lastDraw < 1000 / STENCIL.maxFps) return;
+    dirty = false; lastDraw = now;
     try { drawStencil(); } catch(e){}
-  })();
+  })(performance.now());
 
   // ---- theme toggle ----
   const toggles = document.querySelectorAll('[data-theme-toggle]');
@@ -1476,6 +1565,8 @@ html{scroll-behavior:smooth}
     labelToggles();
     setRate(1);
     loadIdle();
+    if(t === 'dark') ensureDown();
+    relayout();
   }
   toggles.forEach(b => b.addEventListener('click', e => {
     e.stopPropagation();
